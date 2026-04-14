@@ -1,0 +1,190 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <section class="app-bg-card-glass space-y-5 rounded-2xl p-4 sm:p-5 lg:p-6">
+    <div
+      class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between"
+    >
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <lucide-icon
+            [img]="Bell"
+            class="h-6 w-6 text-brand-600 dark:text-brand-300"
+          ></lucide-icon>
+          <h1
+            class="text-xl font-semibold text-gray-900 dark:text-white/90 sm:text-2xl"
+          >
+            Notificaciones
+          </h1>
+        </div>
+
+        <p class="max-w-3xl text-sm text-gray-600 dark:text-gray-300">
+          {{
+            currentRole === "admin"
+              ? "Bandeja operativa para evaluaciones reprobadas, planes de remediacion, evidencias recibidas y casos listos para validar."
+              : "Bandeja operativa para tus acciones asignadas, recordatorios, cuestionarios breves y seguimiento de remediacion."
+          }}
+        </p>
+
+        <div class="flex flex-wrap gap-2">
+          <span
+            class="inline-flex rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+          >
+            {{ currentRole === "admin" ? "ADMIN" : "USER" }}
+          </span>
+          <span
+            class="inline-flex rounded-full border border-gray-200 bg-white/80 px-3 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300"
+          >
+            {{ summary.remediationCount }} alertas de remediacion
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 xl:min-w-[420px]">
+        <article class="rounded-2xl border app-bg-card-glass p-4">
+          <p
+            class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
+          >
+            Total
+          </p>
+          <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+            {{ summary.total }}
+          </p>
+        </article>
+
+        <article class="rounded-2xl border app-bg-card-glass p-4">
+          <p
+            class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
+          >
+            Sin leer
+          </p>
+          <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+            {{ summary.unread }}
+          </p>
+        </article>
+
+        <article class="rounded-2xl border app-bg-card-glass p-4">
+          <p
+            class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
+          >
+            Remediacion
+          </p>
+          <p class="mt-2 text-2xl font-semibold text-brand-600 dark:text-brand-300">
+            {{ summary.remediationCount }}
+          </p>
+        </article>
+
+        <article class="rounded-2xl border app-bg-card-glass p-4">
+          <p
+            class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
+          >
+            Fecha limite / alta prioridad
+          </p>
+          <p class="mt-2 text-2xl font-semibold text-warning-600 dark:text-warning-300">
+            {{ summary.deadlineCount + summary.important }}
+          </p>
+        </article>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      @for (filter of filterOptions; track filter) {
+        <button
+          type="button"
+          class="rounded-xl border px-3 py-2 text-sm font-medium transition"
+          [ngClass]="
+            selectedFilter === filter
+              ? 'border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300'
+              : 'border-gray-200 bg-white/80 text-gray-600 hover:border-brand-200 hover:text-brand-700 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300 dark:hover:border-brand-500/30 dark:hover:text-brand-300'
+          "
+          (click)="selectFilter(filter)"
+        >
+          {{ filter }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <section class="space-y-3">
+    @for (notification of filteredNotifications; track notification.id) {
+      <article class="rounded-2xl border app-bg-card-glass p-4 sm:p-5">
+        <div
+          class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div class="flex gap-4">
+            <span
+              class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+            >
+              <lucide-icon
+                [img]="getNotificationIcon(notification.type)"
+                class="h-5 w-5"
+              ></lucide-icon>
+            </span>
+
+            <div class="space-y-3">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h2
+                    class="text-base font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ notification.title }}
+                  </h2>
+                  <span
+                    class="inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                    [ngClass]="getModuleClasses(notification.module)"
+                  >
+                    {{ notification.module }}
+                  </span>
+                </div>
+                <p class="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  {{ notification.message }}
+                </p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getTypeClasses(notification.type)"
+                >
+                  {{ notification.type }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getStatusClasses(notification.status)"
+                >
+                  {{ notification.status }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border border-gray-200 bg-white/80 px-2.5 py-1 text-xs font-semibold dark:border-gray-700 dark:bg-gray-900/70"
+                  [ngClass]="getPriorityClasses(notification.priority)"
+                >
+                  Prioridad {{ notification.priority }}
+                </span>
+                @if (notification.relatedCategory) {
+                  <span
+                    class="inline-flex rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-300"
+                  >
+                    {{ notification.relatedCategory }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 lg:min-w-[220px] lg:items-end">
+            <div class="text-sm text-gray-500 dark:text-gray-400 lg:text-right">
+              <p>{{ notification.createdAt | date: 'mediumDate' }}</p>
+              <p>{{ notification.createdAt | date: 'shortTime' }}</p>
+            </div>
+
+            <button
+              type="button"
+              class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+              (click)="openNotification(notification.ctaRoute)"
+            >
+              {{ notification.ctaLabel }}
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </section>
+</div>

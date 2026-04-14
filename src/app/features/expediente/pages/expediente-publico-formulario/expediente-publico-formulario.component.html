@@ -1,0 +1,848 @@
+<div
+  class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.10),_transparent_32%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)] text-gray-900 transition-colors dark:bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.14),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] dark:text-white/90"
+>
+  <header class="sticky top-0 z-20 border-b border-white/60 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div class="flex min-w-0 items-center gap-3">
+        <div
+          class="flex h-11 w-11 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10"
+        >
+          <img
+            src="/images/logo/certum360_icono.png"
+            alt="Certum 360"
+            class="h-7 w-7 rounded-xl object-contain"
+          />
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-xs font-semibold uppercase tracking-[0.24em] text-brand-700 dark:text-brand-300">
+            Certum 360
+          </p>
+          <p class="truncate text-sm text-gray-500 dark:text-gray-400">
+            Expediente publico para captura documental
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 transition hover:border-brand-300 hover:text-brand-600 dark:border-gray-800 dark:bg-slate-900 dark:text-gray-300 dark:hover:border-brand-500/40 dark:hover:text-brand-300"
+        (click)="toggleTheme()"
+        [attr.aria-label]="currentTheme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+      >
+        @if (currentTheme === 'dark') {
+          <lucide-icon [img]="SunMedium" class="h-5 w-5"></lucide-icon>
+        } @else {
+          <lucide-icon [img]="MoonStar" class="h-5 w-5"></lucide-icon>
+        }
+      </button>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+    @if (isTokenInvalid) {
+      <section
+        class="mx-auto max-w-2xl rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-slate-950/75 sm:p-8"
+      >
+        <div class="flex items-start gap-4">
+          <span
+            class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+          >
+            <lucide-icon [img]="CircleAlert" class="h-7 w-7"></lucide-icon>
+          </span>
+
+          <div>
+            <h1 class="text-2xl font-semibold">Link no disponible</h1>
+            <p class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+              Este acceso ya no esta disponible o no corresponde a un expediente valido.
+              Solicita una nueva liga al area responsable para continuar con tu captura.
+            </p>
+          </div>
+        </div>
+      </section>
+    } @else if (accessContext) {
+      @if (isSubmitted) {
+        <section class="mx-auto max-w-3xl">
+          <div
+            class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/90 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-slate-950/80"
+          >
+            <div
+              class="border-b border-emerald-100 bg-emerald-50/80 px-6 py-6 dark:border-emerald-500/20 dark:bg-emerald-500/10 sm:px-8"
+            >
+              <span
+                class="inline-flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-200 bg-white text-emerald-600 shadow-sm dark:border-emerald-500/30 dark:bg-slate-950 dark:text-emerald-300"
+              >
+                <lucide-icon [img]="CheckCheck" class="h-8 w-8"></lucide-icon>
+              </span>
+              <h1 class="mt-5 text-3xl font-semibold">Expediente enviado</h1>
+              <p class="mt-3 max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-300">
+                Tu informacion fue enviada correctamente. Ya puedes cerrar esta pagina y
+                esperar la validacion correspondiente.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 px-6 py-6 sm:px-8 lg:grid-cols-3">
+              <article class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                  Persona
+                </p>
+                <p class="mt-3 text-sm font-semibold">{{ accessContext.person.name }}</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {{ accessContext.person.role }}
+                </p>
+              </article>
+
+              <article class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                  Proveedor
+                </p>
+                <p class="mt-3 text-sm font-semibold">{{ accessContext.provider.name }}</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {{ accessContext.provider.serviceType }}
+                </p>
+              </article>
+
+              <article class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                  Enviado
+                </p>
+                <p class="mt-3 text-sm font-semibold">{{ formatDateTime(submittedAt) }}</p>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Se notificara la validacion por el canal correspondiente.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+      } @else {
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div
+            class="space-y-6"
+            [ngClass]="showSidebarCards ? 'lg:col-span-8' : 'lg:col-span-12 lg:mx-auto lg:max-w-4xl'"
+          >
+            <article
+              class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/90 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-slate-950/78"
+            >
+              <div
+                class="border-b border-white/70 bg-[linear-gradient(135deg,_rgba(255,255,255,0.95),_rgba(240,249,255,0.95))] px-5 py-6 dark:border-white/10 dark:bg-[linear-gradient(135deg,_rgba(15,23,42,0.9),_rgba(8,47,73,0.78))] sm:px-7"
+              >
+                @if (!verificationPassed) {
+                  <div class="flex flex-col gap-4">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300">
+                      <lucide-icon [img]="ShieldCheck" class="h-4 w-4"></lucide-icon>
+                      Verificacion de acceso
+                    </div>
+
+                    <div class="min-w-0">
+                      <h1 class="text-3xl font-semibold tracking-tight">
+                        Verifica que eres una persona
+                      </h1>
+                      <p class="mt-3 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
+                        Antes de mostrar la informacion del expediente, valida este acceso para
+                        confirmar que la captura sera realizada por una persona.
+                      </p>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div class="min-w-0">
+                      <div class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300">
+                        <lucide-icon [img]="ShieldCheck" class="h-4 w-4"></lucide-icon>
+                        Captura segura de expediente
+                      </div>
+
+                      <h1 class="mt-4 text-3xl font-semibold tracking-tight">
+                        Completa tu expediente
+                      </h1>
+                      <p class="mt-3 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300">
+                        Revisa cuidadosamente la informacion asociada a tu expediente y completa
+                        los campos y documentos solicitados para continuar con la validacion.
+                      </p>
+
+                      @if (accessContext.hasPrefilledData) {
+                        <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50/90 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+                          Verifica que tus datos sean correctos antes de enviar tu expediente.
+                        </div>
+                      }
+                    </div>
+
+                    <div class="flex w-full flex-col gap-3 md:w-[260px]">
+                      <div class="rounded-2xl border border-gray-200 bg-white/85 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                          Campos
+                        </p>
+                        <p class="mt-2 text-2xl font-semibold">{{ fields.length }}</p>
+                      </div>
+                      <div class="rounded-2xl border border-gray-200 bg-white/85 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                        <p class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                          Documentos
+                        </p>
+                        <p class="mt-2 text-2xl font-semibold">{{ documents.length }}</p>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              @if (!verificationPassed) {
+                <div class="px-5 py-6 sm:px-7 sm:py-7">
+                  <div class="mb-5 flex items-center gap-3">
+                    <span
+                      class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300"
+                    >
+                      <lucide-icon [img]="ScanFace" class="h-6 w-6"></lucide-icon>
+                    </span>
+                    <div>
+                      <h2 class="text-xl font-semibold">Verificacion previa</h2>
+                      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Confirma que eres una persona antes de acceder al formulario.
+                      </p>
+                    </div>
+                  </div>
+
+                  @if (verificationVariant === 'checkbox') {
+                    <div class="rounded-[1.75rem] border border-gray-200 bg-gray-50/85 p-5 dark:border-gray-800 dark:bg-slate-900/60 sm:p-6">
+                      <label
+                        class="flex cursor-pointer items-start gap-4 rounded-2xl border border-gray-200 bg-white px-4 py-4 transition hover:border-brand-200 dark:border-gray-800 dark:bg-slate-950/70 dark:hover:border-brand-500/30"
+                      >
+                        <input
+                          type="checkbox"
+                          class="mt-1 h-5 w-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:bg-slate-900"
+                          [(ngModel)]="robotConfirmed"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                        <div>
+                          <p class="text-sm font-semibold">No soy un robot</p>
+                          <p class="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                            Este paso protege la captura de expediente y evita accesos
+                            automatizados.
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  } @else {
+                    <div class="rounded-[1.75rem] border border-gray-200 bg-gray-50/85 p-5 dark:border-gray-800 dark:bg-slate-900/60 sm:p-6">
+                      <div class="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,220px)_minmax(0,1fr)] md:items-center">
+                        <div
+                          class="rounded-[1.5rem] border border-brand-200 bg-[linear-gradient(135deg,_rgba(14,165,233,0.12),_rgba(168,85,247,0.10))] px-6 py-6 text-center dark:border-brand-500/30 dark:bg-[linear-gradient(135deg,_rgba(8,47,73,0.85),_rgba(76,29,149,0.45))]"
+                        >
+                          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-700 dark:text-brand-300">
+                            Codigo
+                          </p>
+                          <p class="mt-3 font-mono text-3xl font-semibold tracking-[0.35em] text-gray-900 dark:text-white">
+                            {{ challengeCode }}
+                          </p>
+                        </div>
+
+                        <div>
+                          <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Escribe el codigo tal como aparece
+                          </label>
+                          <input
+                            type="text"
+                            [(ngModel)]="challengeAnswer"
+                            [ngModelOptions]="{ standalone: true }"
+                            maxlength="6"
+                            class="h-12 w-full rounded-2xl border border-gray-300 bg-white px-4 text-sm uppercase tracking-[0.3em] text-gray-900 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-slate-950 dark:text-white/90"
+                            placeholder="ABC123"
+                          />
+                          <button
+                            type="button"
+                            class="mt-3 inline-flex h-10 items-center gap-2 rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-brand-300 hover:text-brand-700 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-500/40 dark:hover:text-brand-300"
+                            (click)="refreshChallenge()"
+                          >
+                            <lucide-icon [img]="RefreshCcw" class="h-4 w-4"></lucide-icon>
+                            Generar otro codigo
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  }
+
+                  @if (isMobileViewport) {
+                    <div class="mt-5 rounded-[1.75rem] border border-sky-200 bg-sky-50/80 p-5 dark:border-sky-500/30 dark:bg-sky-500/10 sm:p-6">
+                      <div class="flex items-start gap-3">
+                        <span
+                          class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-sky-700 dark:bg-slate-950 dark:text-sky-300"
+                        >
+                          <lucide-icon [img]="Camera" class="h-5 w-5"></lucide-icon>
+                        </span>
+                        <div>
+                          <h3 class="text-base font-semibold text-sky-900 dark:text-sky-100">
+                            Captura documental desde tu celular
+                          </h3>
+                          <p class="mt-2 text-sm leading-6 text-sky-800 dark:text-sky-200">
+                            Cuando accedas al formulario podras habilitar la camara para capturar
+                            documentos compatibles, como tu identificacion, sin salir del sitio.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+
+                  @if (verificationFeedback) {
+                    <div class="mt-4 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200">
+                      {{ verificationFeedback }}
+                    </div>
+                  }
+
+                  <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      El formulario se habilitara despues de completar este paso.
+                    </p>
+                    <button
+                      type="button"
+                      class="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600"
+                      (click)="continueWithVerification()"
+                    >
+                      <lucide-icon [img]="ShieldCheck" class="h-4 w-4"></lucide-icon>
+                      Continuar al formulario
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <form class="px-5 py-6 sm:px-7 sm:py-7" [formGroup]="publicForm" (ngSubmit)="submitForm()">
+                  <div class="space-y-8">
+                    <section class="rounded-[1.75rem] border border-gray-200 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-slate-900/60 sm:p-6">
+                      <div class="flex items-start gap-3">
+                        <span
+                          class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                        >
+                          <lucide-icon [img]="UserRound" class="h-5 w-5"></lucide-icon>
+                        </span>
+                        <div>
+                          <h2 class="text-xl font-semibold">Informacion de captura</h2>
+                          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Completa primero tus datos de captura y despues agrega la
+                            documentacion solicitada.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                        @for (field of fields; track trackByField($index, field)) {
+                          <div class="space-y-2" [ngClass]="field.type === 'textarea' ? 'md:col-span-2' : ''">
+                            <label
+                              class="flex items-center gap-2.5 text-sm font-medium text-gray-700 dark:text-gray-300"
+                            >
+                              <span
+                                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-slate-950 dark:text-gray-300"
+                              >
+                                <lucide-icon [img]="getFieldIcon(field)" class="h-4 w-4"></lucide-icon>
+                              </span>
+                              <span>{{ field.label }}</span>
+                              @if (field.required) {
+                                <span class="text-rose-500">*</span>
+                              }
+                            </label>
+
+                            @if (field.type === 'textarea') {
+                              <textarea
+                                rows="4"
+                                [formControl]="getControl(field.id)"
+                                class="w-full rounded-2xl border bg-white px-4 py-3 text-sm text-gray-900 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-slate-950 dark:text-white/90"
+                                [ngClass]="
+                                  isFieldInvalid(field.id)
+                                    ? 'border-rose-400 dark:border-rose-500'
+                                    : 'border-gray-300 dark:border-gray-700'
+                                "
+                                [placeholder]="field.placeholder"
+                              ></textarea>
+                            } @else if (field.type === 'select') {
+                              <select
+                                [formControl]="getControl(field.id)"
+                                class="h-12 w-full rounded-2xl border bg-white px-4 text-sm text-gray-900 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-slate-950 dark:text-white/90"
+                                [ngClass]="
+                                  isFieldInvalid(field.id)
+                                    ? 'border-rose-400 dark:border-rose-500'
+                                    : 'border-gray-300 dark:border-gray-700'
+                                "
+                              >
+                                <option value="">{{ field.placeholder }}</option>
+                                @for (option of field.options ?? []; track option) {
+                                  <option [value]="option">{{ option }}</option>
+                                }
+                              </select>
+                            } @else {
+                              <input
+                                [type]="getInputType(field)"
+                                [formControl]="getControl(field.id)"
+                                class="h-12 w-full rounded-2xl border bg-white px-4 text-sm text-gray-900 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-slate-950 dark:text-white/90"
+                                [ngClass]="
+                                  isFieldInvalid(field.id)
+                                    ? 'border-rose-400 dark:border-rose-500'
+                                    : 'border-gray-300 dark:border-gray-700'
+                                "
+                                [placeholder]="field.placeholder"
+                              />
+                            }
+
+                            <p class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+                              {{ field.description }}
+                            </p>
+
+                            @if (isFieldInvalid(field.id)) {
+                              <p class="text-xs text-rose-500">
+                                {{ getFieldErrorMessage(field) }}
+                              </p>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </section>
+
+                    <section class="rounded-[1.75rem] border border-gray-200 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-slate-900/60 sm:p-6">
+                      <div class="flex items-start gap-3">
+                        <span
+                          class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300"
+                        >
+                          <lucide-icon [img]="FileText" class="h-5 w-5"></lucide-icon>
+                        </span>
+                        <div>
+                          <h2 class="text-xl font-semibold">Documentos solicitados</h2>
+                          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Carga los documentos solicitados. Si un archivo ya fue elegido,
+                            podras reemplazarlo antes de enviar el expediente.
+                          </p>
+                        </div>
+                      </div>
+
+                      @if (showMobileCameraPrompt) {
+                        <div class="mt-6 rounded-[1.5rem] border border-sky-200 bg-sky-50/80 p-4 dark:border-sky-500/30 dark:bg-sky-500/10">
+                          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p class="text-sm font-semibold text-sky-900 dark:text-sky-100">
+                                Habilita la camara para capturas rapidas
+                              </p>
+                              <p class="mt-1 text-sm leading-6 text-sky-800 dark:text-sky-200">
+                                Desde tu celular podras usar la camara en documentos compatibles
+                                para fotografiar tu INE u otros archivos solicitados.
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-sky-600 px-4 text-sm font-semibold text-white transition hover:bg-sky-700"
+                              (click)="requestCameraAccess()"
+                            >
+                              <lucide-icon [img]="Camera" class="h-4 w-4"></lucide-icon>
+                              Habilitar camara
+                            </button>
+                          </div>
+
+                          @if (cameraPermissionFeedback) {
+                            <p
+                              class="mt-4 text-sm"
+                              [ngClass]="
+                                cameraPermissionState === 'granted'
+                                  ? 'text-emerald-700 dark:text-emerald-300'
+                                  : 'text-sky-900 dark:text-sky-100'
+                              "
+                            >
+                              {{ cameraPermissionFeedback }}
+                            </p>
+                          }
+                        </div>
+                      }
+
+                      <div class="mt-6 space-y-4">
+                        @for (document of documents; track trackByDocument($index, document)) {
+                          <article class="rounded-[1.5rem] border p-4 transition sm:p-5" [ngClass]="getDocumentCardClass(document)">
+                            <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                              <div class="min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                  <span
+                                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-slate-950 dark:text-gray-300"
+                                  >
+                                    <lucide-icon [img]="getDocumentIcon(document)" class="h-4 w-4"></lucide-icon>
+                                  </span>
+                                  <h3 class="text-base font-semibold">{{ document.label }}</h3>
+                                  <span
+                                    class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                                    [ngClass]="getDocumentBadgeClass(document.required)"
+                                  >
+                                    {{ document.required ? 'Obligatorio' : 'Opcional' }}
+                                  </span>
+                                  <span
+                                    class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                                    [ngClass]="getDocumentStatusClass(document.id)"
+                                  >
+                                    {{ getDocumentStatusLabel(document.id) }}
+                                  </span>
+                                </div>
+
+                                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                                  {{ document.description }}
+                                </p>
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                  {{ getDocumentFormatSummary(document) }}
+                                </p>
+
+                                @if (uploadedDocuments[document.id]; as uploadedDocument) {
+                                  <div class="mt-4 rounded-2xl border border-emerald-200 bg-white/80 p-4 text-sm dark:border-emerald-500/30 dark:bg-slate-950/60">
+                                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+                                      <div class="shrink-0">
+                                        @if (isImagePreview(uploadedDocument)) {
+                                          <div class="h-24 w-24 overflow-hidden rounded-2xl border border-emerald-100 bg-emerald-50 dark:border-emerald-500/20 dark:bg-slate-900">
+                                            <img
+                                              [src]="uploadedDocument.objectUrl"
+                                              [alt]="uploadedDocument.fileName"
+                                              class="h-full w-full object-cover"
+                                            />
+                                          </div>
+                                        } @else if (isPdfPreview(uploadedDocument)) {
+                                          <div class="flex h-24 w-24 flex-col items-center justify-center rounded-2xl border border-emerald-100 bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(236,253,245,0.98))] text-center dark:border-emerald-500/20 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,0.98),_rgba(6,95,70,0.22))]">
+                                            <lucide-icon [img]="FileText" class="h-7 w-7 text-emerald-600 dark:text-emerald-300"></lucide-icon>
+                                            <span class="mt-2 text-[11px] font-semibold tracking-[0.18em] text-emerald-700 dark:text-emerald-200">
+                                              PDF
+                                            </span>
+                                          </div>
+                                        } @else {
+                                          <div class="flex h-24 w-24 flex-col items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-center dark:border-gray-700 dark:bg-slate-900">
+                                            <lucide-icon [img]="FileText" class="h-7 w-7 text-gray-600 dark:text-gray-300"></lucide-icon>
+                                            <span class="mt-2 text-[10px] font-semibold tracking-[0.16em] text-gray-500 dark:text-gray-400">
+                                              {{ uploadedDocument.fileExtension }}
+                                            </span>
+                                          </div>
+                                        }
+                                      </div>
+
+                                      <div class="min-w-0 flex-1">
+                                        <p class="truncate font-semibold text-emerald-700 dark:text-emerald-300">
+                                          {{ uploadedDocument.fileName }}
+                                        </p>
+                                        <p class="mt-1 text-gray-500 dark:text-gray-400">
+                                          {{ uploadedDocument.sizeLabel }} | {{ uploadedDocument.sourceLabel }} |
+                                          {{ formatDateTime(uploadedDocument.uploadedAt) }}
+                                        </p>
+                                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                                          <button
+                                            type="button"
+                                            class="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 text-sm font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:border-emerald-500/40"
+                                            (click)="openDocumentPreview(document.id)"
+                                          >
+                                            <lucide-icon [img]="Eye" class="h-4 w-4"></lucide-icon>
+                                            Ver
+                                          </button>
+                                          <span class="text-xs uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+                                            Vista previa disponible
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                }
+                              </div>
+
+                              <div class="w-full max-w-full lg:max-w-[270px]">
+                                <div class="flex flex-col gap-3">
+                                  <button
+                                    type="button"
+                                    class="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-brand-500 px-4 text-sm font-semibold text-white transition hover:bg-brand-600"
+                                    (click)="openFileDialog(getFileInputId(document.id))"
+                                  >
+                                    <lucide-icon [img]="Upload" class="h-4 w-4"></lucide-icon>
+                                    {{ uploadedDocuments[document.id] ? 'Reemplazar archivo' : 'Subir archivo' }}
+                                  </button>
+
+                                  <input
+                                    [id]="getFileInputId(document.id)"
+                                    type="file"
+                                    class="hidden"
+                                    [accept]="document.accept"
+                                    (change)="onDocumentSelected($event, document, 'Archivo')"
+                                  />
+
+                                  @if (canUseMobileCamera(document)) {
+                                    <button
+                                      type="button"
+                                      class="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:border-brand-300 hover:text-brand-700 dark:border-gray-700 dark:bg-slate-950 dark:text-gray-200 dark:hover:border-brand-500/40 dark:hover:text-brand-300"
+                                      (click)="openFileDialog(getCameraInputId(document.id))"
+                                    >
+                                      <lucide-icon [img]="Camera" class="h-4 w-4"></lucide-icon>
+                                      Usar camara
+                                    </button>
+
+                                    <input
+                                      [id]="getCameraInputId(document.id)"
+                                      type="file"
+                                      class="hidden"
+                                      accept="image/*"
+                                      capture="environment"
+                                      (change)="onDocumentSelected($event, document, 'Camara')"
+                                    />
+                                  }
+
+                                  @if (uploadedDocuments[document.id]) {
+                                    <button
+                                      type="button"
+                                      class="inline-flex h-11 items-center justify-center rounded-2xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-rose-300 hover:text-rose-700 dark:border-gray-700 dark:text-gray-200 dark:hover:border-rose-500/40 dark:hover:text-rose-300"
+                                      (click)="removeDocument(document.id)"
+                                    >
+                                      Quitar archivo
+                                    </button>
+                                  }
+                                </div>
+                              </div>
+                            </div>
+
+                            @if (hasDocumentError(document)) {
+                              <p class="mt-4 text-sm text-rose-600 dark:text-rose-300">
+                                Este documento es obligatorio para enviar el expediente.
+                              </p>
+                            }
+                          </article>
+                        }
+                      </div>
+                    </section>
+
+                    <div class="rounded-[1.75rem] border border-gray-200 bg-white/90 p-5 dark:border-gray-800 dark:bg-slate-950/70 sm:p-6">
+                      <div class="flex flex-col gap-4">
+                        <div>
+                          <h3 class="text-lg font-semibold">Enviar expediente</h3>
+                          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            Al enviar confirmas que la informacion y documentos capturados son
+                            correctos.
+                          </p>
+                        </div>
+
+                        @if (hasSubmissionErrors) {
+                          <div class="rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200">
+                            {{ submissionErrorMessage }}
+                          </div>
+                        }
+
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div class="text-xs uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+                            Revisa el estado de captura antes de enviar
+                          </div>
+
+                          <button
+                            type="submit"
+                            class="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 text-sm font-semibold text-white transition hover:bg-emerald-600"
+                          >
+                            <lucide-icon [img]="Send" class="h-4 w-4"></lucide-icon>
+                            Enviar expediente
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              }
+            </article>
+          </div>
+
+          @if (showSidebarCards) {
+            <aside class="space-y-6 lg:col-span-4 xl:sticky xl:top-24 xl:self-start">
+              <article
+                class="rounded-[2rem] border border-white/70 bg-white/90 p-5 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-slate-950/78 sm:p-6"
+              >
+                <div class="flex items-start gap-3">
+                  <span
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                  >
+                    <lucide-icon [img]="Building2" class="h-5 w-5"></lucide-icon>
+                  </span>
+                  <div class="min-w-0">
+                    <h2 class="text-lg font-semibold">{{ accessContext.provider.name }}</h2>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {{ accessContext.provider.businessName }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="mt-5 space-y-3">
+                  <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                    <div class="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                      <lucide-icon [img]="UserRound" class="h-4 w-4"></lucide-icon>
+                      Persona
+                    </div>
+                    <p class="mt-2 text-sm font-semibold">{{ accessContext.person.name }}</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {{ accessContext.person.role }}
+                    </p>
+                  </div>
+
+                  <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                    <div class="flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                      <lucide-icon [img]="Mail" class="h-4 w-4"></lucide-icon>
+                      Contacto
+                    </div>
+                    <p class="mt-2 text-sm font-semibold">{{ accessContext.provider.contactName }}</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {{ accessContext.provider.contactEmail }}
+                    </p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                      {{ accessContext.provider.contactPhone }}
+                    </p>
+                  </div>
+                </div>
+              </article>
+
+              <article
+                class="rounded-[2rem] border border-white/70 bg-white/90 p-5 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-slate-950/78 sm:p-6"
+              >
+                <h2 class="text-lg font-semibold">Resumen de captura</h2>
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                  <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                    <p class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                      Obligatorios
+                    </p>
+                    <p class="mt-2 text-2xl font-semibold">{{ requiredDocumentsCount }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/60">
+                    <p class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                      Cargados
+                    </p>
+                    <p class="mt-2 text-2xl font-semibold">{{ uploadedDocumentsCount }}</p>
+                  </div>
+                </div>
+
+                <div class="mt-5 rounded-2xl border border-dashed border-gray-300 bg-gray-50/80 p-4 dark:border-gray-700 dark:bg-slate-900/40">
+                  <p class="text-sm font-semibold">Recomendaciones</p>
+                  <ul class="mt-3 space-y-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                    <li>Verifica que el nombre, telefono y correo sean correctos.</li>
+                    <li>Sube archivos legibles y vigentes antes de enviar el expediente.</li>
+                    <li>En movil, el INE permite cargar archivo o capturarlo desde la camara.</li>
+                  </ul>
+                </div>
+
+                <div class="mt-5 rounded-2xl border border-sky-200 bg-sky-50/80 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
+                  <div class="flex items-start gap-3">
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-sky-700 dark:bg-slate-950 dark:text-sky-300">
+                      <lucide-icon [img]="Phone" class="h-5 w-5"></lucide-icon>
+                    </span>
+                    <div>
+                      <p class="text-sm font-semibold text-sky-900 dark:text-sky-100">
+                        Soporte de expediente
+                      </p>
+                      <p class="mt-1 text-sm text-sky-800 dark:text-sky-200">
+                        {{ accessContext.provider.contactEmail }}
+                      </p>
+                      <p class="mt-1 text-sm text-sky-800 dark:text-sky-200">
+                        {{ accessContext.provider.contactPhone }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </aside>
+          }
+        </section>
+      }
+    }
+  </main>
+
+  @if (activeDocumentPreview; as preview) {
+    <div
+      class="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 p-4 backdrop-blur-sm sm:items-center sm:p-6"
+      (click)="closeDocumentPreview()"
+    >
+      <div
+        class="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white shadow-[0_40px_120px_-48px_rgba(15,23,42,0.65)] dark:bg-slate-950"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-5 py-4 dark:border-gray-800 sm:px-6">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+              Vista previa del documento
+            </p>
+            <h3 class="mt-2 truncate text-lg font-semibold sm:text-xl">
+              {{ preview.fileName }}
+            </h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {{ preview.sizeLabel }} | {{ preview.fileExtension }} | {{ formatDateTime(preview.uploadedAt) }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white text-gray-600 transition hover:border-rose-300 hover:text-rose-600 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-300 dark:hover:border-rose-500/40 dark:hover:text-rose-300"
+            (click)="closeDocumentPreview()"
+            aria-label="Cerrar vista previa"
+          >
+            <lucide-icon [img]="X" class="h-5 w-5"></lucide-icon>
+          </button>
+        </div>
+
+        <div class="grid flex-1 grid-cols-1 gap-0 overflow-hidden lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div class="min-h-[300px] bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.10),_transparent_36%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_100%)] p-4 dark:bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.14),_transparent_32%),linear-gradient(180deg,_#020617_0%,_#0f172a_100%)] sm:p-6">
+            <div class="flex h-full min-h-[260px] items-center justify-center overflow-hidden rounded-[1.5rem] border border-gray-200 bg-white dark:border-gray-800 dark:bg-slate-900">
+              @if (isImagePreview(preview)) {
+                <img
+                  [src]="preview.objectUrl"
+                  [alt]="preview.fileName"
+                  class="max-h-[68vh] w-full object-contain"
+                />
+              } @else if (isPdfPreview(preview)) {
+                <object
+                  [attr.data]="preview.objectUrl"
+                  type="application/pdf"
+                  class="h-[68vh] min-h-[320px] w-full"
+                >
+                  <div class="flex h-full min-h-[320px] w-full flex-col items-center justify-center gap-3 px-6 text-center">
+                    <span class="inline-flex h-16 w-16 items-center justify-center rounded-3xl border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
+                      <lucide-icon [img]="FileText" class="h-8 w-8"></lucide-icon>
+                    </span>
+                    <p class="text-base font-semibold">Archivo PDF cargado correctamente</p>
+                    <p class="max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
+                      Tu navegador no mostro el PDF dentro del modal, pero el archivo sigue
+                      disponible como referencia visual para validar la carga realizada.
+                    </p>
+                  </div>
+                </object>
+              } @else {
+                <div class="flex h-full min-h-[320px] w-full flex-col items-center justify-center gap-3 px-6 text-center">
+                  <span class="inline-flex h-16 w-16 items-center justify-center rounded-3xl border border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-slate-800 dark:text-gray-200">
+                    <lucide-icon [img]="FileText" class="h-8 w-8"></lucide-icon>
+                  </span>
+                  <p class="text-base font-semibold">{{ preview.fileExtension }}</p>
+                  <p class="max-w-md text-sm leading-6 text-gray-500 dark:text-gray-400">
+                    Este archivo ya fue cargado y esta listo para formar parte del expediente.
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <aside class="border-t border-gray-200 bg-white/95 p-5 dark:border-gray-800 dark:bg-slate-950/95 lg:border-t-0 lg:border-l">
+            <div class="space-y-4">
+              <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/70">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                  Archivo
+                </p>
+                <p class="mt-2 break-words text-sm font-semibold">{{ preview.fileName }}</p>
+              </div>
+
+              <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-slate-900/70">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400">
+                  Detalle
+                </p>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                  {{ preview.sizeLabel }} | {{ preview.sourceLabel }}
+                </p>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                  Formato: {{ preview.fileExtension }}
+                </p>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                  Cargado: {{ formatDateTime(preview.uploadedAt) }}
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-sky-200 bg-sky-50/80 p-4 dark:border-sky-500/20 dark:bg-sky-500/10">
+                <p class="text-sm font-semibold text-sky-900 dark:text-sky-100">
+                  Revision visual
+                </p>
+                <p class="mt-2 text-sm leading-6 text-sky-800 dark:text-sky-200">
+                  Usa esta vista para confirmar que el archivo corresponde al documento correcto
+                  antes de enviar el expediente.
+                </p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  }
+</div>

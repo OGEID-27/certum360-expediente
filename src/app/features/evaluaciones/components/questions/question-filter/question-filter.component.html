@@ -1,0 +1,77 @@
+<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+  <p class="mb-2 text-sm font-medium text-gray-800 dark:text-white/90">
+    {{ question.titulo }}
+    @if (question.obligatoria) {
+    <span class="text-error-500">*</span>
+    }
+  </p>
+
+  @if (question.ayuda) {
+  <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">{{ question.ayuda }}</p>
+  }
+
+  <div class="space-y-2">
+    @for (option of options; track option.id) {
+    <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+      <input
+        class="h-4 w-4 border-gray-300 text-brand-500 focus:ring-brand-500"
+        type="radio"
+        [name]="question.id"
+        [checked]="isSelected(option.id)"
+        (change)="selectOption(option.id)"
+      />
+      <span>{{ option.texto }}</span>
+    </label>
+    }
+  </div>
+
+  <div class="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+    <div class="border-b border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-400">
+      Reglas configuradas (dummy)
+    </div>
+    <div class="max-h-44 overflow-auto">
+      <table class="min-w-full text-left text-xs">
+        <thead class="sticky top-0 bg-white dark:bg-gray-900">
+          <tr>
+            <th class="px-3 py-2 text-gray-500 dark:text-gray-400">Respuesta</th>
+            <th class="px-3 py-2 text-gray-500 dark:text-gray-400">Destino</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+          @for (rule of rules; track $index) {
+          <tr>
+            <td class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ rule.answerValue }}</td>
+            <td class="px-3 py-2 text-gray-700 dark:text-gray-300">
+              @if (rule.endQuiz) {
+              Finalizar cuestionario
+              } @else {
+              {{ rule.goToQuestionId || 'Sin destino' }}
+              }
+            </td>
+          </tr>
+          }
+          @if (rules.length === 0) {
+          <tr>
+            <td colspan="2" class="px-3 py-3 text-center text-gray-500 dark:text-gray-400">No hay reglas definidas.</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (selectedRule) {
+  <p class="mt-3 rounded-md bg-brand-50 px-3 py-2 text-xs text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
+    Regla activa: {{ selectedRule.answerValue }}
+    @if (selectedRule.endQuiz) {
+    -> finalizar
+    } @else {
+    -> {{ selectedRule.goToQuestionId || 'sin destino' }}
+    }
+  </p>
+  }
+
+  @if (showRequiredError) {
+  <p class="mt-2 text-xs text-error-500">Debes seleccionar una opcion.</p>
+  }
+</div>

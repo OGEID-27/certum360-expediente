@@ -1,0 +1,52 @@
+<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+  <p class="mb-2 text-sm font-medium text-gray-800 dark:text-white/90">
+    {{ question.titulo }}
+    @if (question.obligatoria) {
+      <span class="text-error-500">*</span>
+    }
+  </p>
+
+  @if (question.ayuda) {
+    <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+      {{ question.ayuda }}
+    </p>
+  }
+
+  <div
+    class="grid grid-cols-1 gap-2 sm:grid-cols-2"
+    role="radiogroup"
+    [attr.aria-label]="question.titulo"
+  >
+    <button
+      type="button"
+      class="rounded-lg border px-4 py-2.5 text-sm font-medium transition"
+      [ngClass]="{
+        'border-success-300 bg-success-50 text-success-700 dark:border-success-500/40 dark:bg-success-500/10 dark:text-success-300':
+          isSelected(true),
+        'bg-white border-gray-300 text-gray-700 hover:border-success-200 hover:bg-success-50/60 dark:border-gray-700  dark:hover:border-success-500/40 dark:hover:bg-success-500/10 dark:bg-gray-900 dark:text-white/90':
+          !isSelected(true),
+      }"
+      (click)="setValue(true)"
+    >
+      {{ trueLabel }}
+    </button>
+
+    <button
+      type="button"
+      class="rounded-lg border px-4 py-2.5 text-sm font-medium transition"
+      [ngClass]="{
+        'border-error-300 bg-error-50 text-error-700 dark:border-error-500/40 dark:bg-error-500/10 dark:text-error-300':
+          isSelected(false),
+        'bg-white border-gray-300 text-gray-700 hover:border-error-200 hover:bg-error-50/60 dark:border-gray-700  dark:hover:border-error-500/40 dark:hover:bg-error-500/10 dark:bg-gray-900 dark:text-white/90':
+          !isSelected(false),
+      }"
+      (click)="setValue(false)"
+    >
+      {{ falseLabel }}
+    </button>
+  </div>
+
+  @if (showRequiredError) {
+    <p class="mt-2 text-xs text-error-500">Debes seleccionar una opcion.</p>
+  }
+</div>

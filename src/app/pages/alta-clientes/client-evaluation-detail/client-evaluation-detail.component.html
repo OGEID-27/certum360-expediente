@@ -1,0 +1,1038 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 pb-4">
+  @if (loadError) {
+    <div class="app-bg-card-glass rounded-2xl p-5 sm:p-6">
+      <div class="space-y-4">
+        <p class="text-sm text-rose-600 dark:text-rose-300">{{ loadError }}</p>
+        <button
+          type="button"
+          class="inline-flex h-11 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+          (click)="goBack()"
+        >
+          Volver
+        </button>
+      </div>
+    </div>
+  } @else if (
+    assignment && client && selectedQuestionnaire && selectedSection
+  ) {
+    <div class="space-y-4">
+      <section class="app-bg-card-glass rounded-2xl p-4 sm:p-5 lg:p-6">
+        <div
+          class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between"
+        >
+          <div class="flex min-w-0 items-start gap-4">
+            <span
+              class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+            >
+              <lucide-icon
+                [img]="isGradingMode ? ClipboardCheck : Eye"
+                class="h-7 w-7"
+              ></lucide-icon>
+            </span>
+
+            <div class="min-w-0 space-y-3">
+              <div>
+                <p
+                  class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600 dark:text-brand-300"
+                >
+                  {{
+                    isGradingMode
+                      ? "Calificacion administrativa"
+                      : "Detalle de cuestionarios"
+                  }}
+                </p>
+                <h1
+                  class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ userName }}
+                </h1>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  {{ client.nombreCliente }} &middot;
+                  {{ assignment.certificationName }}
+                  @if (isGradingMode) {
+                    &middot; Flujo editable para revisar y calificar.
+                  } @else {
+                    &middot; Consulta informativa de respuestas y cuestionarios.
+                  }
+                </p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getStatusClass(overallStatus)"
+                >
+                  {{ overallStatusLabel }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getStatusClass(selectedQuestionnaire.status)"
+                >
+                  {{ selectedQuestionnaire.statusLabel }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getAreaChipClass(userArea)"
+                >
+                  Area: {{ userArea }}
+                </span>
+                @if (userEmail) {
+                  <span
+                    class="inline-flex rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                  >
+                    {{ userEmail }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row xl:flex-col xl:items-end">
+            <button
+              type="button"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+              (click)="goBack()"
+            >
+              <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+              Volver
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-200 dark:hover:bg-brand-500/15"
+              [disabled]="selectedActionDisabled"
+              [ngClass]="
+                selectedActionDisabled ? 'cursor-not-allowed opacity-60' : ''
+              "
+              (click)="openSelectedQuestionnaire()"
+            >
+              <lucide-icon [img]="Eye" class="h-4 w-4"></lucide-icon>
+              {{ selectedActionLabel }}
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+              >
+                <lucide-icon [img]="Users" class="h-4 w-4"></lucide-icon>
+              </span>
+              <div>
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Usuario
+                </p>
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ userSecondary }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
+              >
+                <lucide-icon [img]="CircleGauge" class="h-4 w-4"></lucide-icon>
+              </span>
+              <div>
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  {{ isGradingMode ? "Progreso admin" : "Progreso usuario" }}
+                </p>
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{
+                    formatPercent(
+                      isGradingMode
+                        ? overallReviewProgress
+                        : selectedQuestionnaire.metrics.progressPercent
+                    )
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-sky-600 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300"
+              >
+                <lucide-icon [img]="History" class="h-4 w-4"></lucide-icon>
+              </span>
+              <div>
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Ultima actividad
+                </p>
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{
+                    formatDate(
+                      selectedQuestionnaire.latestAttempt?.submittedAt ||
+                        selectedQuestionnaire.latestAttempt?.startedAt ||
+                        assignment.createdAt
+                    )
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 text-violet-600 dark:border-violet-500/30 dark:bg-violet-500/10 dark:text-violet-300"
+              >
+                <lucide-icon [img]="Building2" class="h-4 w-4"></lucide-icon>
+              </span>
+              <div>
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Cuestionario actual
+                </p>
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ selectedQuestionnaire.entry.questionnaireName }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      @if (isGradingMode && actionMessage) {
+        <div
+          class="rounded-2xl border px-4 py-3 text-sm"
+          [ngClass]="{
+            'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300':
+              actionMessageType === 'success',
+            'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300':
+              actionMessageType === 'warning',
+            'border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-300':
+              actionMessageType === 'info',
+          }"
+        >
+          {{ actionMessage }}
+        </div>
+      }
+
+      @if (isGradingMode) {
+        <section class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-6">
+          <article
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Revision total
+            </p>
+            <p
+              class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              {{ formatPercent(overallReviewProgress) }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {{ overallReviewedQuestions }}/{{ overallTotalQuestions }}
+              preguntas calificadas
+            </p>
+          </article>
+
+          <article
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Porcentaje acumulado
+            </p>
+            <p
+              class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              {{ formatPercent(overallScorePercent) }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Impacto ponderado por cuestionario
+            </p>
+          </article>
+
+          <article
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Obligatorias listas
+            </p>
+            <p
+              class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              {{ overallRequiredSectionsComplete }}/{{
+                overallRequiredSectionsTotal
+              }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Secciones criticas cerradas
+            </p>
+          </article>
+
+          <article
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Opcionales
+            </p>
+            <p
+              class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              {{ overallOptionalSections }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Bloques de apoyo o validacion extra
+            </p>
+          </article>
+
+          <article
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Preguntas calificadas
+            </p>
+            <p
+              class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              {{ overallReviewedQuestions }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Marcadas con criterio admin
+            </p>
+          </article>
+
+          <article
+            class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Pendientes admin
+            </p>
+            <p
+              class="mt-2 text-2xl font-semibold text-amber-600 dark:text-amber-300"
+            >
+              {{ overallPendingQuestions }}
+            </p>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {{ pendingQuestionnairesCount }} cuestionarios aun abiertos
+            </p>
+          </article>
+        </section>
+      }
+
+      <section class="grid grid-cols-1 gap-4 xl:items-start xl:grid-cols-12">
+        <aside
+          class="app-bg-card-glass rounded-2xl p-4 xl:col-span-3 xl:sticky xl:top-30 xl:self-start"
+        >
+          <div>
+            <div class="flex items-center gap-2">
+              <lucide-icon
+                [img]="Layers3"
+                class="h-4 w-4 text-brand-600 dark:text-brand-300"
+              ></lucide-icon>
+              <h2
+                class="text-sm font-semibold text-gray-900 dark:text-white/90"
+              >
+                Cuestionarios y secciones
+              </h2>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              {{
+                isGradingMode
+                  ? "Selecciona un cuestionario pendiente y recorre sus secciones para calificar."
+                  : "Selecciona un cuestionario y revisa su detalle en modo solo lectura."
+              }}
+            </p>
+
+            <div class="mt-4 space-y-3">
+              @for (
+                questionnaire of questionnaires;
+                track questionnaire.entry.questionnaireId
+              ) {
+                <div
+                  class="rounded-2xl border p-3"
+                  [ngClass]="
+                    questionnaire.entry.questionnaireId ===
+                    selectedQuestionnaireId
+                      ? 'border-brand-300 bg-brand-50/80 dark:border-brand-500/40 dark:bg-brand-500/10'
+                      : 'border-gray-200 bg-white/80 dark:border-gray-800 dark:bg-gray-950/60'
+                  "
+                >
+                  <button
+                    type="button"
+                    class="w-full text-left"
+                    (click)="
+                      selectQuestionnaire(questionnaire.entry.questionnaireId)
+                    "
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span
+                            class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                            [ngClass]="
+                              getAreaChipClass(
+                                questionnaire.entry.questionnaireArea
+                              )
+                            "
+                          >
+                            {{ questionnaire.entry.questionnaireArea }}
+                          </span>
+                          <span
+                            class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                            [ngClass]="getStatusClass(questionnaire.status)"
+                          >
+                            {{ questionnaire.statusLabel }}
+                          </span>
+                        </div>
+                        <p
+                          class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                        >
+                          {{ questionnaire.entry.questionnaireName }}
+                        </p>
+                        <p
+                          class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          @if (isGradingMode) {
+                            Admin:
+                            {{
+                              formatPercent(
+                                questionnaire.reviewSummary.progressPercent
+                              )
+                            }}
+                            &middot; Score:
+                            {{
+                              formatPercent(
+                                questionnaire.reviewSummary.weightedScore
+                              )
+                            }}
+                          } @else {
+                            Usuario:
+                            {{ questionnaire.metrics.answeredCount }}/{{
+                              questionnaire.metrics.totalQuestions
+                            }}
+                            respondidas
+                          }
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <p
+                          class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                        >
+                          @if (isGradingMode) {
+                            {{
+                              questionnaire.reviewSummary.reviewedQuestions
+                            }}/{{
+                              questionnaire.reviewSummary
+                                .totalReviewableQuestions
+                            }}
+                          } @else {
+                            {{ questionnaire.metrics.answeredCount }}/{{
+                              questionnaire.metrics.totalQuestions
+                            }}
+                          }
+                        </p>
+                        <p class="text-[11px] text-gray-500 dark:text-gray-400">
+                          {{ isGradingMode ? "calificadas" : "respondidas" }}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <div
+                    class="mt-3 h-1.5 rounded-full bg-gray-200 dark:bg-gray-800"
+                  >
+                    <div
+                      class="h-1.5 rounded-full bg-brand-500 transition-all duration-300"
+                      [style.width.%]="
+                        isGradingMode
+                          ? questionnaire.reviewSummary.progressPercent
+                          : questionnaire.metrics.progressPercent
+                      "
+                    ></div>
+                  </div>
+
+                  @if (
+                    questionnaire.entry.questionnaireId ===
+                    selectedQuestionnaireId
+                  ) {
+                    <div class="mt-3 space-y-2">
+                      @for (
+                        section of questionnaire.sections;
+                        track section.key
+                      ) {
+                        <button
+                          type="button"
+                          class="flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition"
+                          [ngClass]="
+                            section.key === selectedSectionKey
+                              ? 'border-brand-300 bg-white dark:border-brand-500/40 dark:bg-gray-900'
+                              : 'border-transparent bg-white/70 hover:border-brand-200 dark:bg-gray-900/50 dark:hover:border-brand-500/30'
+                          "
+                          (click)="selectSection(section.key)"
+                        >
+                          <div class="min-w-0">
+                            <p
+                              class="text-sm font-medium text-gray-900 dark:text-white/90"
+                            >
+                              {{ section.section.nombre }}
+                            </p>
+                            <p
+                              class="mt-1 text-[11px] text-gray-500 dark:text-gray-400"
+                            >
+                              {{
+                                section.isRequired ? "Obligatoria" : "Opcional"
+                              }}
+                              @if (isGradingMode) {
+                                &middot; {{ getSectionWeightLabel(section) }}
+                              } @else {
+                                &middot;
+                                {{ section.questions.length }} preguntas
+                              }
+                            </p>
+                          </div>
+                          <span
+                            class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                            [ngClass]="getReviewStateClass(section.state)"
+                          >
+                            {{ getReviewStateLabel(section.state) }}
+                          </span>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </aside>
+
+        <div
+          class="space-y-4"
+          [ngClass]="isGradingMode ? 'xl:col-span-6' : 'xl:col-span-9'"
+        >
+          <div class="app-bg-card-glass rounded-2xl p-4 sm:p-5">
+            <div
+              class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+            >
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  @if (isGradingMode) {
+                    <span
+                      class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                      [ngClass]="getReviewStateClass(selectedSection.state)"
+                    >
+                      {{ getReviewStateLabel(selectedSection.state) }}
+                    </span>
+                  }
+                  <span
+                    class="inline-flex rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                  >
+                    {{
+                      selectedSection.isRequired
+                        ? "Seccion obligatoria"
+                        : "Seccion opcional"
+                    }}
+                  </span>
+                  @if (isGradingMode) {
+                    <span
+                      class="inline-flex rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                    >
+                      {{ getSectionWeightLabel(selectedSection) }}
+                    </span>
+                  }
+                </div>
+
+                <h2
+                  class="mt-3 text-xl font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ selectedSection.section.nombre }}
+                </h2>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  {{
+                    selectedSection.section.descripcion ||
+                      (isGradingMode
+                        ? "Bloque de revision para respuestas del usuario y calificacion administrativa."
+                        : "Bloque informativo para revisar las respuestas capturadas por el usuario.")
+                  }}
+                </p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 sm:min-w-[260px]">
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/60"
+                >
+                  <p
+                    class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    {{ isGradingMode ? "Calificadas" : "Respondidas" }}
+                  </p>
+                  <p
+                    class="mt-2 text-xl font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    @if (isGradingMode) {
+                      {{ selectedSection.reviewedCount }}/{{
+                        selectedSection.totalReviewableQuestions
+                      }}
+                    } @else {
+                      {{ getAnsweredQuestionsCount(selectedSection) }}/{{
+                        selectedSection.questions.length
+                      }}
+                    }
+                  </p>
+                </div>
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/60"
+                >
+                  <p
+                    class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    {{ isGradingMode ? "Avance admin" : "Avance usuario" }}
+                  </p>
+                  <p
+                    class="mt-2 text-xl font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{
+                      formatPercent(
+                        isGradingMode
+                          ? selectedSection.progressPercent
+                          : getAnsweredQuestionsProgress(selectedSection)
+                      )
+                    }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 h-2 rounded-full bg-gray-200 dark:bg-gray-800">
+              <div
+                class="h-2 rounded-full bg-brand-500 transition-all duration-300"
+                [style.width.%]="
+                  isGradingMode
+                    ? selectedSection.progressPercent
+                    : getAnsweredQuestionsProgress(selectedSection)
+                "
+              ></div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            @for (question of selectedSection.questions; track question.key) {
+              <article class="app-bg-card-glass rounded-2xl p-4 sm:p-5">
+                <div class="flex flex-col gap-4">
+                  <div
+                    class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between"
+                  >
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        @if (isGradingMode) {
+                          <span
+                            class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                            [ngClass]="getReviewStateClass(question.state)"
+                          >
+                            {{ getReviewStateLabel(question.state) }}
+                          </span>
+                        }
+                        <span
+                          class="inline-flex rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                        >
+                          {{ getQuestionTypeLabel(question.question) }}
+                        </span>
+                        <span
+                          class="inline-flex rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                        >
+                          {{ question.isRequired ? "Obligatoria" : "Opcional" }}
+                        </span>
+                        <span
+                          class="inline-flex rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                        >
+                          {{ getQuestionWeightLabel(question) }}
+                        </span>
+                      </div>
+
+                      <h3
+                        class="mt-3 text-base font-semibold text-gray-900 dark:text-white/90"
+                      >
+                        {{ question.question.titulo }}
+                      </h3>
+                      @if (question.question.ayuda) {
+                        <p
+                          class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+                        >
+                          {{ question.question.ayuda }}
+                        </p>
+                      }
+                    </div>
+
+                    <div
+                      class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 text-right dark:border-gray-800 dark:bg-gray-950/60"
+                    >
+                      <p
+                        class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        Respuesta usuario
+                      </p>
+                      <p
+                        class="mt-1 text-sm font-semibold"
+                        [ngClass]="
+                          question.answered
+                            ? 'text-emerald-600 dark:text-emerald-300'
+                            : 'text-amber-600 dark:text-amber-300'
+                        "
+                      >
+                        {{ question.answered ? "Registrada" : "Sin respuesta" }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-2xl border p-4"
+                    [ngClass]="getQuestionAnswerClass(question)"
+                  >
+                    <div class="flex items-center gap-2">
+                      <lucide-icon
+                        [img]="FileText"
+                        class="h-4 w-4"
+                      ></lucide-icon>
+                      <p class="text-xs font-semibold uppercase tracking-wide">
+                        Detalle capturado
+                      </p>
+                    </div>
+
+                    <div class="mt-3 space-y-2 text-sm">
+                      @for (line of question.answerLines; track line) {
+                        <p class="break-words leading-6">{{ line }}</p>
+                      }
+                    </div>
+                  </div>
+
+                  @if (canEditQuestionnaire(selectedQuestionnaire)) {
+                    <div class="space-y-3">
+                      <div class="flex items-center gap-2">
+                        <lucide-icon
+                          [img]="ListChecks"
+                          class="h-4 w-4 text-brand-600 dark:text-brand-300"
+                        ></lucide-icon>
+                        <p
+                          class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                        >
+                          Calificacion administrativa
+                        </p>
+                      </div>
+
+                      <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        @for (option of reviewOptions; track option.value) {
+                          <button
+                            type="button"
+                            class="rounded-xl border px-3 py-3 text-left text-sm font-medium transition focus:outline-hidden focus:ring-4 focus:ring-brand-500/15"
+                            [ngClass]="
+                              getReviewOptionClass(question, option.value)
+                            "
+                            (click)="
+                              updateQuestionGrade(
+                                selectedQuestionnaire,
+                                question,
+                                option.value
+                              )
+                            "
+                          >
+                            <span class="block">{{ option.label }}</span>
+                            <span class="mt-1 block text-[11px] opacity-80">{{
+                              option.hint
+                            }}</span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="space-y-2">
+                      <label
+                        class="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                      >
+                        <lucide-icon
+                          [img]="MessageSquareText"
+                          class="h-4 w-4 text-brand-600 dark:text-brand-300"
+                        ></lucide-icon>
+                        Observacion del evaluador
+                      </label>
+                      <textarea
+                        rows="3"
+                        [ngModel]="question.comment"
+                        (ngModelChange)="
+                          updateQuestionComment(
+                            selectedQuestionnaire,
+                            question,
+                            $event
+                          )
+                        "
+                        placeholder="Agrega contexto o retroalimentacion breve para esta respuesta."
+                        class="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+                      ></textarea>
+                    </div>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          @if (canGradeSelectedQuestionnaire) {
+            <div class="app-bg-card-glass rounded-2xl p-4">
+              <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Recorre la calificacion por secciones con una navegacion
+                  guiada.
+                </p>
+
+                <div class="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    class="inline-flex h-11 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                    [disabled]="!hasPreviousGradingStep"
+                    (click)="goToPreviousGradingStep()"
+                  >
+                    Anterior
+                  </button>
+
+                  <button
+                    type="button"
+                    class="inline-flex h-11 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-brand-300 dark:disabled:bg-brand-500/40"
+                    [disabled]="!hasNextGradingStep"
+                    (click)="goToNextGradingStep()"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (isGradingMode) {
+          <aside
+            class="app-bg-card-glass rounded-2xl p-4 xl:col-span-3 xl:sticky xl:top-30 xl:self-start"
+          >
+            <div>
+              <div class="flex items-center gap-2">
+                <lucide-icon
+                  [img]="Target"
+                  class="h-4 w-4 text-brand-600 dark:text-brand-300"
+                ></lucide-icon>
+                <h2
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  Resumen administrativo
+                </h2>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+                >
+                  <p
+                    class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    Cuestionario seleccionado
+                  </p>
+                  <p
+                    class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ selectedQuestionnaire.entry.questionnaireName }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{
+                      formatPercent(
+                        selectedQuestionnaire.reviewSummary.progressPercent
+                      )
+                    }}
+                    revisado &middot;
+                    {{
+                      formatPercent(
+                        selectedQuestionnaire.reviewSummary.weightedScore
+                      )
+                    }}
+                    acumulado
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+                >
+                  <div class="flex items-center justify-between gap-3">
+                    <p
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      Secciones obligatorias
+                    </p>
+                    <span
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{
+                        selectedQuestionnaire.reviewSummary
+                          .requiredSectionsComplete
+                      }}/{{
+                        selectedQuestionnaire.reviewSummary
+                          .requiredSectionsTotal
+                      }}
+                    </span>
+                  </div>
+                  <div
+                    class="mt-3 h-2 rounded-full bg-gray-200 dark:bg-gray-800"
+                  >
+                    <div
+                      class="h-2 rounded-full bg-emerald-500 transition-all duration-300"
+                      [style.width.%]="
+                        selectedQuestionnaire.reviewSummary
+                          .requiredSectionsTotal > 0
+                          ? (selectedQuestionnaire.reviewSummary
+                              .requiredSectionsComplete /
+                              selectedQuestionnaire.reviewSummary
+                                .requiredSectionsTotal) *
+                            100
+                          : 0
+                      "
+                    ></div>
+                  </div>
+                  <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    {{ selectedQuestionnaire.reviewSummary.optionalSections }}
+                    secciones opcionales disponibles.
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/60"
+                >
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <p
+                        class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        Preguntas listas
+                      </p>
+                      <p
+                        class="mt-2 text-xl font-semibold text-gray-900 dark:text-white/90"
+                      >
+                        {{
+                          selectedQuestionnaire.reviewSummary.reviewedQuestions
+                        }}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        Pendientes
+                      </p>
+                      <p
+                        class="mt-2 text-xl font-semibold text-amber-600 dark:text-amber-300"
+                      >
+                        {{
+                          selectedQuestionnaire.reviewSummary.pendingQuestions
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                @if (selectedQuestionnaire.reviewSummary.savedAt) {
+                  <div
+                    class="rounded-2xl border border-sky-200 bg-sky-50/80 p-4 text-sm text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300"
+                  >
+                    Ultimo guardado local:
+                    {{
+                      formatDate(selectedQuestionnaire.reviewSummary.savedAt)
+                    }}
+                  </div>
+                }
+
+                @if (selectedQuestionnaire.reviewSummary.finalizedAt) {
+                  <div
+                    class="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 text-sm text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
+                  >
+                    Revision finalizada:
+                    {{
+                      formatDate(
+                        selectedQuestionnaire.reviewSummary.finalizedAt
+                      )
+                    }}
+                  </div>
+                } @else if (
+                  selectedQuestionnaire.reviewSummary.pendingQuestions > 0
+                ) {
+                  <div
+                    class="rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300"
+                  >
+                    Aun faltan
+                    {{ selectedQuestionnaire.reviewSummary.pendingQuestions }}
+                    preguntas por calificar para cerrar este cuestionario.
+                  </div>
+                }
+
+                <div class="space-y-3">
+                  <button
+                    type="button"
+                    class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                    (click)="saveSelectedReview()"
+                  >
+                    <lucide-icon [img]="Save" class="h-4 w-4"></lucide-icon>
+                    Guardar calificacion
+                  </button>
+
+                  <button
+                    type="button"
+                    class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-brand-300 dark:disabled:bg-brand-500/40"
+                    [disabled]="
+                      !selectedQuestionnaire.reviewSummary.isFinalizable
+                    "
+                    (click)="finalizeSelectedReview()"
+                  >
+                    <lucide-icon
+                      [img]="BadgeCheck"
+                      class="h-4 w-4"
+                    ></lucide-icon>
+                    Finalizar revision
+                  </button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        }
+      </section>
+    </div>
+  }
+</div>

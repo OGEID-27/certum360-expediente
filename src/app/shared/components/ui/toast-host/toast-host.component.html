@@ -1,0 +1,32 @@
+<div
+  class="pointer-events-none fixed right-4 bottom-4 z-[99999] flex w-full max-w-sm flex-col gap-2 sm:right-6 sm:bottom-6"
+>
+  @if (toasts$ | async; as toasts) {
+    @for (toast of toasts; track toast.id) {
+      <div
+        class="pointer-events-auto rounded-xl border px-4 py-3 shadow-theme-lg"
+        [ngClass]="getToastClass(toast.type)"
+      >
+        <div class="flex items-start gap-3">
+          <lucide-icon
+            [img]="getToastIcon(toast.type)"
+            [ngClass]="getToastIconClass(toast.type)"
+            class="mt-0.5 h-5 w-5 shrink-0"
+          ></lucide-icon>
+
+          <p class="flex-1 text-sm font-medium leading-relaxed">
+            {{ toast.message }}
+          </p>
+          <button
+            type="button"
+            class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-base leading-none text-current/70 transition hover:bg-white/40 hover:text-current dark:hover:bg-white/10"
+            (click)="dismiss(toast.id)"
+            aria-label="Cerrar alerta"
+          >
+            x
+          </button>
+        </div>
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,1198 @@
+<div class="space-y-6">
+  <section class="app-bg-card-glass overflow-hidden rounded-[28px] p-0">
+    <div class="relative overflow-hidden px-5 py-6 sm:px-6 lg:px-8 lg:py-7">
+      <div
+        class="absolute inset-x-0 top-0 h-28 bg-linear-to-r from-brand-500/18 via-sky-500/10 to-emerald-500/12"
+      ></div>
+      <div
+        class="absolute -top-12 right-0 h-32 w-32 rounded-full bg-brand-400/12 blur-3xl dark:bg-brand-300/10"
+      ></div>
+
+      <div
+        class="relative flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between"
+      >
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <span
+            class="inline-flex h-18 w-18 items-center justify-center rounded-[22px] bg-gray-900 text-xl font-semibold tracking-[0.18em] text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.65)] dark:bg-white dark:text-gray-900"
+          >
+            {{ initials }}
+          </span>
+
+          <div class="space-y-3">
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-600 dark:text-brand-300"
+              >
+                Centro de configuracion
+              </p>
+              <h1
+                class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/95"
+              >
+                {{ profile.fullName }}
+              </h1>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                {{ profile.email }} | {{ profile.company }}
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              @for (badge of accountBadges; track badge.label) {
+                <span
+                  class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium"
+                  [ngClass]="badge.tone"
+                >
+                  {{ badge.label }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:w-[360px]">
+          <div
+            class="rounded-2xl border border-white/45 bg-white/80 p-4 shadow-sm dark:border-white/10 dark:bg-white/5"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+              >
+                <lucide-icon [img]="Shield" class="h-5 w-5"></lucide-icon>
+              </span>
+              <div>
+                <p
+                  class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                >
+                  Seguridad
+                </p>
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  Nivel {{ profile.securityLevel.toLowerCase() }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-white/45 bg-white/80 p-4 shadow-sm dark:border-white/10 dark:bg-white/5"
+          >
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300"
+              >
+                <lucide-icon [img]="BadgeCheck" class="h-5 w-5"></lucide-icon>
+              </span>
+              <div>
+                <p
+                  class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                >
+                  Estatus de pago
+                </p>
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ profile.paymentStatus }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
+    <aside
+      class="app-bg-card-glass rounded-[28px] p-3 xl:sticky xl:top-30 xl:self-start"
+    >
+      <div class="space-y-2">
+        @for (section of sections; track section.id) {
+          <button
+            type="button"
+            class="flex w-full items-start gap-3 rounded-2xl px-4 py-3 text-left transition"
+            [ngClass]="
+              activeSection === section.id
+                ? 'bg-gray-900 text-white shadow-[0_18px_40px_-28px_rgba(15,23,42,0.9)] dark:bg-white dark:text-gray-900'
+                : 'text-gray-700 hover:bg-white/75 dark:text-gray-200 dark:hover:bg-white/6'
+            "
+            (click)="setActiveSection(section.id)"
+          >
+            <span
+              class="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl"
+              [ngClass]="
+                activeSection === section.id
+                  ? 'bg-white/15 text-white dark:bg-gray-900/10 dark:text-gray-900'
+                  : 'bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300'
+              "
+            >
+              <lucide-icon
+                [img]="$any(section.icon)"
+                class="h-5 w-5"
+              ></lucide-icon>
+            </span>
+
+            <span class="min-w-0">
+              <span class="block text-sm font-semibold">{{
+                section.label
+              }}</span>
+              <span
+                class="mt-1 block text-xs leading-5"
+                [ngClass]="
+                  activeSection === section.id
+                    ? 'text-white/70 dark:text-gray-600'
+                    : 'text-gray-500 dark:text-gray-400'
+                "
+              >
+                {{ section.helper }}
+              </span>
+            </span>
+          </button>
+        }
+      </div>
+    </aside>
+
+    <div class="space-y-6">
+      @if (activeSection === "profile") {
+        <app-component-card
+          title="Informacion del usuario"
+          [titleIcon]="UserRound"
+          titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+          desc="Ficha visual del usuario actual cargada desde mocks locales por rol."
+        >
+          <div
+            class="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]"
+          >
+            <div
+              class="rounded-3xl border border-gray-200/80 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.03]"
+            >
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <span
+                  class="inline-flex h-20 w-20 items-center justify-center rounded-[24px] bg-linear-to-br from-brand-500 to-sky-500 text-xl font-semibold tracking-[0.2em] text-white"
+                >
+                  {{ initials }}
+                </span>
+
+                <div class="min-w-0">
+                  <h3
+                    class="text-xl font-semibold text-gray-900 dark:text-white/95"
+                  >
+                    {{ profile.fullName }}
+                  </h3>
+                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                    {{ profile.roleLabel }} | {{ profile.area }}
+                  </p>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {{ profile.company }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                <div
+                  class="rounded-2xl border border-dashed border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <p
+                    class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                  >
+                    Correo
+                  </p>
+                  <p
+                    class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ profile.email }}
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-2xl border border-dashed border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <p
+                    class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                  >
+                    Telefono
+                  </p>
+                  <p
+                    class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ profile.phone }}
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-2xl border border-dashed border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <p
+                    class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                  >
+                    Fecha de alta
+                  </p>
+                  <p
+                    class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ profile.joinedAt | date: "dd MMM yyyy" }}
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-2xl border border-dashed border-gray-200 p-4 dark:border-gray-700"
+                >
+                  <p
+                    class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                  >
+                    Cuenta
+                  </p>
+                  <p
+                    class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ profile.accountId }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div
+                class="rounded-3xl border border-gray-200/80 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.03]"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+                  >
+                    <lucide-icon
+                      [img]="CalendarDays"
+                      class="h-5 w-5"
+                    ></lucide-icon>
+                  </span>
+                  <div>
+                    <p
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      Proxima renovacion dummy
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ profile.nextBillingDate | date: "dd MMM yyyy" }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="rounded-3xl border border-gray-200/80 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.03]"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300"
+                  >
+                    <lucide-icon
+                      [img]="BadgeCheck"
+                      class="h-5 w-5"
+                    ></lucide-icon>
+                  </span>
+                  <div>
+                    <p
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      Estado de cuenta
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ profile.paymentStatus }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="rounded-3xl border border-gray-200/80 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.03]"
+              >
+                <div class="flex items-center gap-3">
+                  <span
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-900/8 text-gray-700 dark:bg-white/10 dark:text-white/80"
+                  >
+                    <lucide-icon [img]="Info" class="h-5 w-5"></lucide-icon>
+                  </span>
+                  <div>
+                    <p
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      Observacion operativa
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Perfil listo para futura edicion y conexion con backend.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </app-component-card>
+      } @else {
+        <div class="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+          @for (card of summaryCards; track card.label) {
+            <div class="app-bg-card-glass overflow-hidden rounded-[28px] p-5">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p
+                    class="text-xs uppercase tracking-[0.22em] text-gray-500 dark:text-gray-400"
+                  >
+                    {{ card.label }}
+                  </p>
+                  <p
+                    class="mt-3 text-xl font-semibold text-gray-900 dark:text-white/95"
+                  >
+                    {{ card.value }}
+                  </p>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {{ card.helper }}
+                  </p>
+                </div>
+
+                <span
+                  class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+                >
+                  <lucide-icon
+                    [img]="$any(card.icon)"
+                    class="h-5 w-5"
+                  ></lucide-icon>
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div
+          class="grid gap-6 2xl:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)]"
+        >
+          <app-component-card
+            title="Agregar metodo de pago"
+            [titleIcon]="editingMode ? Pencil : CreditCard"
+            titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+            className="overflow-hidden rounded-[28px] "
+            [desc]="
+              editingMode
+                ? 'Actualiza el metodo seleccionado. Todo permanece en local como demo.'
+                : 'Formulario visual para agregar tarjetas, transferencias, referencias locales o PayPal.'
+            "
+          >
+            <div class="grid gap-5">
+              @switch (selectedPaymentType) {
+                @case ("paypal") {
+                  <div
+                    class="rounded-[28px] border border-sky-300/20 bg-linear-to-br from-[#003087] via-[#00457C] to-[#001C64] p-5 text-white"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-[0.28em] text-white/60"
+                        >
+                          Preview
+                        </p>
+                        <p class="mt-3 text-lg font-semibold">
+                          {{
+                            paymentForm.get("alias")?.value || "Cuenta PayPal"
+                          }}
+                        </p>
+                        <p class="mt-1 text-sm text-white/75">
+                          Checkout digital conectado
+                        </p>
+                      </div>
+
+                      <span
+                        class="rounded-2xl border border-white/10 bg-white/95 px-3 py-2 shadow-sm"
+                      >
+                        <img
+                          [src]="paypalAsset"
+                          alt="PayPal"
+                          class="h-7 w-auto"
+                        />
+                      </span>
+                    </div>
+
+                    <div class="mt-5 flex flex-wrap items-center gap-3">
+                      <span
+                        class="inline-flex rounded-full border px-3 py-1 text-xs font-medium"
+                        [ngClass]="previewStatusClass"
+                      >
+                        {{ previewStatusLabel }}
+                      </span>
+                      <span
+                        class="text-xs uppercase tracking-[0.22em] text-white/65"
+                      >
+                        Inicia sesion con PayPal
+                      </span>
+                    </div>
+
+                    <div
+                      class="mt-8 rounded-[24px] border border-white/12 bg-black/10 p-4 backdrop-blur-sm"
+                    >
+                      <p
+                        class="text-xs uppercase tracking-[0.2em] text-white/55"
+                      >
+                        Cuenta dummy
+                      </p>
+                      <p class="mt-2 text-lg font-semibold text-white">
+                        {{ previewReferenceValue }}
+                      </p>
+
+                      <div
+                        class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+                      >
+                        <div>
+                          <p
+                            class="text-xs uppercase tracking-[0.2em] text-white/55"
+                          >
+                            Titular
+                          </p>
+                          <p class="mt-1 text-sm text-white/85">
+                            {{
+                              paymentForm.get("holderName")?.value ||
+                                profile.fullName
+                            }}
+                          </p>
+                        </div>
+
+                        <div
+                          class="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-[#003087]"
+                        >
+                          Continuar con PayPal
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+                @case ("bank-transfer") {
+                  <div
+                    class="rounded-[28px] border border-emerald-300/15 bg-linear-to-br from-slate-950 via-emerald-950 to-slate-900 p-5 text-white"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-[0.28em] text-white/60"
+                        >
+                          Preview
+                        </p>
+                        <p class="mt-3 text-lg font-semibold">
+                          {{
+                            paymentForm.get("alias")?.value ||
+                              "Cuenta para transferencia"
+                          }}
+                        </p>
+                        <p class="mt-1 text-sm text-white/75">
+                          Transferencia bancaria local
+                        </p>
+                      </div>
+
+                      <span
+                        class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white/85"
+                      >
+                        <lucide-icon
+                          [img]="Landmark"
+                          class="h-6 w-6"
+                        ></lucide-icon>
+                      </span>
+                    </div>
+
+                    <div class="mt-5">
+                      <span
+                        class="inline-flex rounded-full border px-3 py-1 text-xs font-medium"
+                        [ngClass]="previewStatusClass"
+                      >
+                        {{ previewStatusLabel }}
+                      </span>
+                    </div>
+
+                    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                      <div
+                        class="rounded-[24px] border border-white/12 bg-white/6 p-4"
+                      >
+                        <p
+                          class="text-xs uppercase tracking-[0.2em] text-white/55"
+                        >
+                          CLABE / cuenta
+                        </p>
+                        <p class="mt-2 text-base font-semibold text-white">
+                          {{ previewReferenceValue }}
+                        </p>
+                      </div>
+
+                      <div
+                        class="rounded-[24px] border border-white/12 bg-white/6 p-4"
+                      >
+                        <p
+                          class="text-xs uppercase tracking-[0.2em] text-white/55"
+                        >
+                          Banco receptor
+                        </p>
+                        <p class="mt-2 text-base font-semibold text-white">
+                          {{ previewBankName }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                }
+                @case ("direct-debit") {
+                  <div
+                    class="rounded-[28px] border border-cyan-300/15 bg-linear-to-br from-slate-950 via-cyan-950 to-slate-900 p-5 text-white"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-[0.28em] text-white/60"
+                        >
+                          Preview
+                        </p>
+                        <p class="mt-3 text-lg font-semibold">
+                          {{
+                            paymentForm.get("alias")?.value ||
+                              "Cargo automatico"
+                          }}
+                        </p>
+                        <p class="mt-1 text-sm text-white/75">
+                          Domiciliacion recurrente
+                        </p>
+                      </div>
+
+                      <span
+                        class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white/85"
+                      >
+                        <lucide-icon
+                          [img]="Wallet"
+                          class="h-6 w-6"
+                        ></lucide-icon>
+                      </span>
+                    </div>
+
+                    <div class="mt-5">
+                      <span
+                        class="inline-flex rounded-full border px-3 py-1 text-xs font-medium"
+                        [ngClass]="previewStatusClass"
+                      >
+                        {{ previewStatusLabel }}
+                      </span>
+                    </div>
+
+                    <div
+                      class="mt-8 rounded-[24px] border border-white/12 bg-white/6 p-4"
+                    >
+                      <div
+                        class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+                      >
+                        <div>
+                          <p
+                            class="text-xs uppercase tracking-[0.2em] text-white/55"
+                          >
+                            Convenio / cuenta
+                          </p>
+                          <p class="mt-2 text-base font-semibold text-white">
+                            {{ previewReferenceValue }}
+                          </p>
+                        </div>
+
+                        <div class="text-sm text-white/75">
+                          Cargo recurrente habilitado para
+                          {{
+                            paymentForm.get("holderName")?.value ||
+                              profile.fullName
+                          }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+                @case ("bank-reference") {
+                  <div
+                    class="rounded-[28px] border border-amber-300/15 bg-linear-to-br from-slate-950 via-amber-950 to-slate-900 p-5 text-white"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-[0.28em] text-white/60"
+                        >
+                          Preview
+                        </p>
+                        <p class="mt-3 text-lg font-semibold">
+                          {{
+                            paymentForm.get("alias")?.value ||
+                              "Referencia bancaria"
+                          }}
+                        </p>
+                        <p class="mt-1 text-sm text-white/75">
+                          Pago manual por referencia
+                        </p>
+                      </div>
+
+                      <span
+                        class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white/85"
+                      >
+                        <lucide-icon
+                          [img]="BadgeDollarSign"
+                          class="h-6 w-6"
+                        ></lucide-icon>
+                      </span>
+                    </div>
+
+                    <div class="mt-5">
+                      <span
+                        class="inline-flex rounded-full border px-3 py-1 text-xs font-medium"
+                        [ngClass]="previewStatusClass"
+                      >
+                        {{ previewStatusLabel }}
+                      </span>
+                    </div>
+
+                    <div
+                      class="mt-8 rounded-[24px] border border-white/12 bg-white/6 p-4"
+                    >
+                      <p
+                        class="text-xs uppercase tracking-[0.2em] text-white/55"
+                      >
+                        Linea de captura dummy
+                      </p>
+                      <p class="mt-2 text-lg font-semibold text-white">
+                        {{ previewReferenceValue }}
+                      </p>
+                      <p class="mt-4 text-sm text-white/75">
+                        Disponible para pago manual y conciliacion local.
+                      </p>
+                    </div>
+                  </div>
+                }
+                @default {
+                  <div
+                    class="rounded-[28px] border border-gray-200/10 bg-linear-to-br from-gray-950 via-slate-900 to-slate-800 p-5 text-white"
+                  >
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-[0.28em] text-white/60"
+                        >
+                          Preview
+                        </p>
+                        <p class="mt-3 text-lg font-semibold">
+                          {{
+                            paymentForm.get("alias")?.value || "Nuevo metodo"
+                          }}
+                        </p>
+                        <p class="mt-1 text-sm text-white/70">
+                          {{ activePaymentTypeLabel }}
+                        </p>
+                      </div>
+
+                      @if (detectedBrandAsset) {
+                        <span
+                          class="rounded-2xl border border-white/10 bg-white/95 px-3 py-2 shadow-sm"
+                        >
+                          <img
+                            [src]="detectedBrandAsset"
+                            [alt]="detectedCardBrand || 'Tarjeta'"
+                            class="h-7 w-auto"
+                          />
+                        </span>
+                      } @else {
+                        <span
+                          class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white/80"
+                        >
+                          <lucide-icon
+                            [img]="$any(previewMethodIcon)"
+                            class="h-6 w-6"
+                          ></lucide-icon>
+                        </span>
+                      }
+                    </div>
+
+                    <div class="mt-5">
+                      <span
+                        class="inline-flex rounded-full border px-3 py-1 text-xs font-medium"
+                        [ngClass]="previewStatusClass"
+                      >
+                        {{ previewStatusLabel }}
+                      </span>
+                    </div>
+
+                    <div class="mt-10 flex items-end justify-between gap-4">
+                      <div>
+                        <p class="text-sm tracking-[0.34em] text-white/90">
+                          {{ previewReferenceValue }}
+                        </p>
+                        <p
+                          class="mt-4 text-xs uppercase tracking-[0.2em] text-white/50"
+                        >
+                          Titular
+                        </p>
+                        <p class="mt-1 text-sm text-white/80">
+                          {{
+                            paymentForm.get("holderName")?.value ||
+                              profile.fullName
+                          }}
+                        </p>
+                      </div>
+
+                      <div class="text-right">
+                        <p
+                          class="text-xs uppercase tracking-[0.2em] text-white/50"
+                        >
+                          Expira
+                        </p>
+                        <p class="mt-1 text-sm text-white/80">
+                          {{ paymentForm.get("expiration")?.value || "--/--" }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                }
+              }
+
+              <form
+                class="grid gap-4"
+                [formGroup]="paymentForm"
+                (ngSubmit)="submitPaymentMethod()"
+              >
+                <div>
+                  <div
+                    class="mb-1.5 flex flex-wrap items-center justify-between gap-2"
+                  >
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >Tipo de metodo</label
+                    >
+                    <span
+                      class="text-xs font-medium text-brand-600 dark:text-brand-300"
+                    >
+                      {{ activePaymentTypeLabel }}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                    @for (option of paymentTypeOptions; track option.value) {
+                      <button
+                        type="button"
+                        class="group relative flex min-h-[68px] items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left transition"
+                        [ngClass]="
+                          isPaymentTypeSelected(option.value)
+                            ? 'border-brand-300 bg-brand-50/80 shadow-[0_16px_28px_-24px_rgba(15,23,42,0.45)] dark:border-brand-500/35 dark:bg-brand-500/10'
+                            : 'border-gray-200/80 bg-white/80 hover:border-brand-200 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-brand-500/25 dark:hover:bg-white/[0.05]'
+                        "
+                        (click)="setPaymentType(option.value)"
+                      >
+                        <span
+                          class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                          [ngClass]="
+                            isPaymentTypeSelected(option.value)
+                              ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'
+                              : 'bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300'
+                          "
+                        >
+                          @if (getPaymentTypeAsset(option.value)) {
+                            <img
+                              [src]="getPaymentTypeAsset(option.value)!"
+                              [alt]="option.label"
+                              class="h-5 w-auto"
+                            />
+                          } @else {
+                            <lucide-icon
+                              [img]="$any(getPaymentTypeIcon(option.value))"
+                              class="h-[18px] w-[18px]"
+                            ></lucide-icon>
+                          }
+                        </span>
+
+                        <span class="min-w-0 flex flex-1 items-center justify-between gap-2">
+                          <span
+                            class="truncate text-sm font-semibold"
+                            [ngClass]="
+                              isPaymentTypeSelected(option.value)
+                                ? 'text-gray-900 dark:text-white/95'
+                                : 'text-gray-800 dark:text-white/90'
+                            "
+                          >
+                            {{ option.label }}
+                          </span>
+
+                          @if (isPaymentTypeSelected(option.value)) {
+                            <span
+                              class="inline-flex shrink-0 rounded-full bg-gray-900/8 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.16em] text-brand-700 dark:bg-white/10 dark:text-brand-200"
+                            >
+                              Activo
+                            </span>
+                          }
+                        </span>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label
+                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >Nombre del titular</label
+                    >
+                    <input
+                      type="text"
+                      formControlName="holderName"
+                      class="h-11 w-full rounded-xl border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                      [ngClass]="
+                        isInvalid('holderName')
+                          ? 'border-red-400 dark:border-red-500'
+                          : 'border-gray-300 dark:border-gray-700'
+                      "
+                    />
+                    @if (hasError("holderName", "required")) {
+                      <p class="mt-1 text-xs text-red-500">
+                        Campo obligatorio.
+                      </p>
+                    }
+                  </div>
+
+                  <div>
+                    <label
+                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >Alias del metodo</label
+                    >
+                    <input
+                      type="text"
+                      formControlName="alias"
+                      class="h-11 w-full rounded-xl border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                      [ngClass]="
+                        isInvalid('alias')
+                          ? 'border-red-400 dark:border-red-500'
+                          : 'border-gray-300 dark:border-gray-700'
+                      "
+                    />
+                    @if (hasError("alias", "required")) {
+                      <p class="mt-1 text-xs text-red-500">
+                        Campo obligatorio.
+                      </p>
+                    }
+                  </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div class="sm:col-span-2">
+                    <label
+                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {{ referenceFieldLabel }}
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="reference"
+                      class="h-11 w-full rounded-xl border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                      [ngClass]="
+                        isInvalid('reference')
+                          ? 'border-red-400 dark:border-red-500'
+                          : 'border-gray-300 dark:border-gray-700'
+                      "
+                      [placeholder]="referenceFieldPlaceholder"
+                    />
+                    @if (showCardFields && detectedCardBrand) {
+                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Tipo detectado:
+                        {{
+                          detectedCardBrand === "amex"
+                            ? "American Express"
+                            : (detectedCardBrand | titlecase)
+                        }}
+                      </p>
+                    }
+                  </div>
+
+                  @if (showCardFields) {
+                    <div>
+                      <label
+                        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >Fecha de expiracion</label
+                      >
+                      <input
+                        type="text"
+                        formControlName="expiration"
+                        class="h-11 w-full rounded-xl border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                        [ngClass]="
+                          isInvalid('expiration')
+                            ? 'border-red-400 dark:border-red-500'
+                            : 'border-gray-300 dark:border-gray-700'
+                        "
+                        placeholder="MM/AA"
+                      />
+                      @if (hasError("expiration", "required")) {
+                        <p class="mt-1 text-xs text-red-500">
+                          Campo obligatorio.
+                        </p>
+                      }
+                      @if (hasError("expiration", "pattern")) {
+                        <p class="mt-1 text-xs text-red-500">Formato MM/AA.</p>
+                      }
+                    </div>
+
+                    <div>
+                      <label
+                        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >CVV dummy</label
+                      >
+                      <input
+                        type="text"
+                        formControlName="cvv"
+                        class="h-11 w-full rounded-xl border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                        [ngClass]="
+                          isInvalid('cvv')
+                            ? 'border-red-400 dark:border-red-500'
+                            : 'border-gray-300 dark:border-gray-700'
+                        "
+                        placeholder="123"
+                      />
+                      @if (hasError("cvv", "required")) {
+                        <p class="mt-1 text-xs text-red-500">
+                          Campo obligatorio.
+                        </p>
+                      }
+                      @if (hasError("cvv", "pattern")) {
+                        <p class="mt-1 text-xs text-red-500">
+                          Usa 3 o 4 digitos.
+                        </p>
+                      }
+                    </div>
+                  }
+
+                  @if (showBankNameField) {
+                    <div>
+                      <label
+                        class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >{{ bankFieldLabel }}</label
+                      >
+                      <input
+                        type="text"
+                        formControlName="bankName"
+                        class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                        [placeholder]="bankFieldPlaceholder"
+                      />
+                    </div>
+                  }
+
+                  <div>
+                    <label
+                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >Metodo predeterminado</label
+                    >
+                    <label
+                      class="flex h-11 items-center gap-3 rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                    >
+                      <input
+                        type="checkbox"
+                        formControlName="isDefault"
+                        class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                      />
+                      Marcar como principal
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >Observaciones</label
+                  >
+                  <textarea
+                    rows="3"
+                    formControlName="notes"
+                    class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                    placeholder="Notas internas o contexto del metodo local."
+                  ></textarea>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-end gap-3">
+                  @if (editingMode) {
+                    <button
+                      type="button"
+                      class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                      (click)="cancelEdition()"
+                    >
+                      Cancelar edicion
+                    </button>
+                  }
+
+                  <button
+                    type="submit"
+                    class="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600"
+                  >
+                    {{ editingMode ? "Guardar cambios" : "Agregar metodo" }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </app-component-card>
+
+          <app-component-card
+            title="Metodos registrados"
+            [titleIcon]="Wallet"
+            titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+            className="overflow-hidden rounded-[28px]"
+            desc="Visualizacion premium de metodos agregados y acciones locales de administracion."
+          >
+            @if (paymentMethods.length === 0) {
+              <div
+                class="rounded-3xl border border-dashed border-gray-300 p-8 text-center dark:border-gray-700"
+              >
+                <p
+                  class="text-base font-semibold text-gray-900 dark:text-white/90"
+                >
+                  No hay metodos registrados
+                </p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Usa el formulario para crear tu primer metodo de pago dummy.
+                </p>
+              </div>
+            } @else {
+              <div class="grid gap-4">
+                @for (method of paymentMethods; track method.id) {
+                  <article
+                    class="rounded-[28px] border border-gray-200/80 bg-white/75 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.03]"
+                  >
+                    <div
+                      class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+                    >
+                      <div class="flex min-w-0 gap-4">
+                        <span
+                          class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-3xl bg-gray-900 text-white dark:bg-white dark:text-gray-900"
+                        >
+                          @if (getMethodAsset(method)) {
+                            <img
+                              [src]="getMethodAsset(method)!"
+                              [alt]="
+                                method.type === 'paypal'
+                                  ? 'PayPal'
+                                  : method.brand || method.alias
+                              "
+                              class="h-8 w-auto rounded-lg bg-white p-1"
+                            />
+                          } @else {
+                            <lucide-icon
+                              [img]="$any(getMethodIcon(method))"
+                              class="h-6 w-6"
+                            ></lucide-icon>
+                          }
+                        </span>
+
+                        <div class="min-w-0">
+                          <div class="flex flex-wrap items-center gap-2">
+                            <h3
+                              class="text-base font-semibold text-gray-900 dark:text-white/95"
+                            >
+                              {{ method.alias }}
+                            </h3>
+                            <span
+                              class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-medium"
+                              [ngClass]="getMethodBadgeClass(method)"
+                            >
+                              {{
+                                method.isDefault
+                                  ? "Principal"
+                                  : getMethodTypeLabel(method.type)
+                              }}
+                            </span>
+                            <span
+                              class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-medium"
+                              [ngClass]="getStatusBadgeClass(method.status)"
+                            >
+                              {{ method.status }}
+                            </span>
+                          </div>
+
+                          <p
+                            class="mt-2 text-sm text-gray-600 dark:text-gray-300"
+                          >
+                            {{ method.maskedValue }}
+                          </p>
+
+                          <div
+                            class="mt-3 grid gap-2 text-sm text-gray-500 dark:text-gray-400 sm:grid-cols-2"
+                          >
+                            <p>
+                              <span
+                                class="font-medium text-gray-700 dark:text-gray-200"
+                                >Titular:</span
+                              >
+                              {{ method.holderName }}
+                            </p>
+                            <p>
+                              <span
+                                class="font-medium text-gray-700 dark:text-gray-200"
+                                >Banco:</span
+                              >
+                              {{ method.bankName || "No especificado" }}
+                            </p>
+                            <p>
+                              <span
+                                class="font-medium text-gray-700 dark:text-gray-200"
+                                >Expira:</span
+                              >
+                              {{ method.expiration || "No aplica" }}
+                            </p>
+                            <p>
+                              <span
+                                class="font-medium text-gray-700 dark:text-gray-200"
+                                >Verificacion:</span
+                              >
+                              {{
+                                method.isVerified
+                                  ? "Validada localmente"
+                                  : "Pendiente local"
+                              }}
+                            </p>
+                          </div>
+
+                          @if (method.notes) {
+                            <p
+                              class="mt-3 text-sm text-gray-500 dark:text-gray-400"
+                            >
+                              {{ method.notes }}
+                            </p>
+                          }
+                        </div>
+                      </div>
+
+                      <div
+                        class="flex flex-wrap items-center gap-2 lg:justify-end"
+                      >
+                        @if (!method.isDefault) {
+                          <button
+                            type="button"
+                            class="rounded-xl border border-brand-200 bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/15"
+                            (click)="markAsDefault(method.id)"
+                          >
+                            Marcar principal
+                          </button>
+                        }
+
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                          (click)="editMethod(method)"
+                        >
+                          <lucide-icon
+                            [img]="Pencil"
+                            class="h-4 w-4"
+                          ></lucide-icon>
+                          Editar
+                        </button>
+
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/15"
+                          (click)="removeMethod(method.id)"
+                        >
+                          <lucide-icon
+                            [img]="Trash2"
+                            class="h-4 w-4"
+                          ></lucide-icon>
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            }
+          </app-component-card>
+        </div>
+      }
+    </div>
+  </div>
+</div>

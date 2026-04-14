@@ -1,0 +1,41 @@
+<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+  <p class="mb-2 text-sm font-medium text-gray-800 dark:text-white/90">
+    {{ question.titulo }}
+    @if (question.obligatoria) {
+      <span class="text-error-500">*</span>
+    }
+  </p>
+
+  @if (question.ayuda) {
+    <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+      {{ question.ayuda }}
+    </p>
+  }
+
+  <textarea
+    [formControl]="control"
+    rows="4"
+    [placeholder]="placeholder"
+    class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+  ></textarea>
+
+  @if (maxLength) {
+    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+      {{ (control.value ?? "").length }} / {{ maxLength }}
+    </p>
+  }
+
+  @if (showRequiredError) {
+    <p class="mt-2 text-xs text-error-500">Debes responder esta pregunta.</p>
+  }
+  @if (showMinError && minLength) {
+    <p class="mt-2 text-xs text-error-500">
+      La respuesta debe tener al menos {{ minLength }} caracteres.
+    </p>
+  }
+  @if (showMaxError && maxLength) {
+    <p class="mt-2 text-xs text-error-500">
+      La respuesta no puede superar {{ maxLength }} caracteres.
+    </p>
+  }
+</div>

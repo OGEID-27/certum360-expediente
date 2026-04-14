@@ -1,0 +1,1087 @@
+@if (provider) {
+  <div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+    <section class="app-bg-card-glass space-y-5 rounded-2xl p-4 sm:p-5 lg:p-6">
+      <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div class="space-y-4">
+          <a
+            [routerLink]="['/expediente/proveedores']"
+            class="inline-flex items-center gap-2 text-sm font-medium text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
+          >
+            <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+            Volver a proveedores
+          </a>
+
+          <div class="flex items-start gap-4">
+            <span
+              class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+            >
+              <lucide-icon [img]="Building2" class="h-7 w-7"></lucide-icon>
+            </span>
+
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getStatusClass(provider.status)"
+                >
+                  {{ provider.status }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getComplianceClass(provider.complianceStatus)"
+                >
+                  {{ provider.complianceStatus }}
+                </span>
+              </div>
+
+              <h1 class="mt-3 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                {{ provider.name }}
+              </h1>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {{ provider.businessName }}
+              </p>
+
+              <div class="mt-4 grid grid-cols-1 gap-3 text-sm text-gray-600 dark:text-gray-300 md:grid-cols-2">
+                <div class="rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/40">
+                  <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Giro / servicio
+                  </p>
+                  <p class="mt-2 font-medium text-gray-900 dark:text-white/90">
+                    {{ provider.serviceType }}
+                  </p>
+                </div>
+
+                <div class="rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/40">
+                  <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Contacto principal
+                  </p>
+                  <p class="mt-2 font-medium text-gray-900 dark:text-white/90">
+                    {{ provider.contactName }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ provider.contactEmail }} / {{ provider.contactPhone }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:min-w-[420px]">
+          <div class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/60">
+            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              Cumplimiento
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+              {{ provider.compliancePercent }}%
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/60">
+            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              Personas
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+              {{ provider.registeredPeople }}
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/60">
+            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              Expedientes vigentes
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+              {{ provider.activeRecords }}
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/60">
+            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              Pendientes
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-amber-600 dark:text-amber-300">
+              {{ provider.pendingItems }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          class="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+          (click)="openEdit()"
+        >
+          <lucide-icon [img]="Pencil" class="h-4 w-4"></lucide-icon>
+          Editar proveedor
+        </button>
+
+        <button
+          type="button"
+          class="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+          (click)="openTemplateConfig()"
+        >
+          <lucide-icon [img]="LayoutTemplate" class="h-4 w-4"></lucide-icon>
+          Configurar plantilla
+        </button>
+
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          Proxima revision: {{ formatDateTime(provider.nextReviewAt) }}
+        </div>
+      </div>
+    </section>
+
+    <section class="app-bg-card-glass rounded-2xl p-3 sm:p-4">
+      <div class="flex flex-wrap gap-2">
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            class="inline-flex h-10 items-center rounded-full border px-4 text-sm font-medium transition"
+            [ngClass]="
+              activeTab === tab.id
+                ? 'border-brand-500 bg-brand-500 text-white shadow-sm'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+            "
+            (click)="setActiveTab(tab.id)"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+    </section>
+
+    @if (activeTab === 'resumen') {
+      <section class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div class="space-y-4 xl:col-span-8">
+          <article class="app-bg-card-glass rounded-2xl p-5">
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+              >
+                <lucide-icon [img]="ShieldCheck" class="h-5 w-5"></lucide-icon>
+              </span>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+                  Situacion ejecutiva
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Estado general del proveedor y focos de seguimiento.
+                </p>
+              </div>
+            </div>
+
+            <p class="mt-5 text-sm leading-6 text-gray-600 dark:text-gray-300">
+              {{ provider.executiveSummary }}
+            </p>
+
+            <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Vigentes
+                </p>
+                <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                  {{ provider.activeRecords }}
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Observados / pendientes
+                </p>
+                <p class="mt-2 text-2xl font-semibold text-amber-600 dark:text-amber-300">
+                  {{ provider.pendingItems }}
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Por vencer
+                </p>
+                <p class="mt-2 text-2xl font-semibold text-rose-600 dark:text-rose-300">
+                  {{ provider.expiringDocuments }}
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <article class="app-bg-card-glass rounded-2xl p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+                  Cumplimiento documental
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Indicador general para seguimiento del expediente.
+                </p>
+              </div>
+              <span
+                class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                [ngClass]="getComplianceClass(provider.complianceStatus)"
+              >
+                {{ provider.complianceStatus }}
+              </span>
+            </div>
+
+            <div class="mt-5 h-3 rounded-full bg-gray-200 dark:bg-gray-800">
+              <div
+                class="h-3 rounded-full bg-brand-500 transition-all duration-300"
+                [style.width.%]="provider.compliancePercent"
+              ></div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Ultima actualizacion
+                </p>
+                <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                  {{ formatDateTime(provider.updatedAt) }}
+                </p>
+              </div>
+              <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Proxima revision
+                </p>
+                <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                  {{ formatDateTime(provider.nextReviewAt) }}
+                </p>
+              </div>
+              <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Estatus general
+                </p>
+                <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                  {{ provider.status }}
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="space-y-4 xl:col-span-4">
+          <article class="app-bg-card-glass rounded-2xl p-5">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+              Vista ejecutiva
+            </h2>
+            <div class="mt-4 space-y-3">
+              <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Contacto principal
+                </p>
+                <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                  {{ provider.contactName }}
+                </p>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {{ provider.contactEmail }}
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Plantilla asignada
+                </p>
+                <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                  {{ provider.template.name }}
+                </p>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {{ provider.template.version }} / {{ provider.template.assignedBy }}
+                </p>
+              </div>
+
+              <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Ventana de seguimiento
+                </p>
+                <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                  {{ provider.reviewStatus }}
+                </p>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Corte programado {{ formatDate(provider.nextReviewAt) }}
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    }
+
+    @if (activeTab === 'personas') {
+      <section class="app-bg-card-glass overflow-hidden rounded-2xl">
+        <div class="flex flex-col gap-4 border-b border-gray-200 px-4 py-4 dark:border-gray-800 sm:px-5">
+          <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+                Personas del proveedor
+              </h2>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Registro inicial, accesos rapidos y seguimiento ejecutivo por persona.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+              (click)="openCreatePersonModal()"
+            >
+              <lucide-icon [img]="Plus" class="h-4 w-4"></lucide-icon>
+              Agregar persona
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Personas visibles
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                {{ totalPeople }}
+              </p>
+            </article>
+
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Documentos por plantilla
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                {{ requestedDocuments.length }}
+              </p>
+            </article>
+
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Ultima revision
+              </p>
+              <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+                {{ formatDateTime(provider.updatedAt) }}
+              </p>
+            </article>
+          </div>
+        </div>
+
+        <div class="max-w-full overflow-x-auto">
+          <table class="min-w-[1080px] w-full text-left 2xl:min-w-[1180px]">
+            <thead class="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
+              <tr>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Nombre
+                </th>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Puesto / actividad
+                </th>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Estado del expediente
+                </th>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Estatus documental
+                </th>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Vigencia
+                </th>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Ultima actualizacion
+                </th>
+                <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Link
+                </th>
+                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              @for (person of paginatedPeople; track trackByPerson($index, person)) {
+                <tr class="bg-white transition hover:bg-brand-50/40 dark:bg-transparent dark:hover:bg-brand-500/5">
+                  <td class="px-4 py-4 align-top">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                      {{ person.name }}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      {{ person.email }}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      {{ person.phone }}
+                    </p>
+                  </td>
+                  <td class="px-4 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                    {{ person.role }}
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <span
+                      class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                      [ngClass]="getPersonStatusClass(person.recordStatus)"
+                    >
+                      {{ person.recordStatus }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <p class="text-sm font-semibold" [ngClass]="getPersonDocumentTone(person)">
+                      {{ getPersonDocumentSummary(person) }}
+                    </p>
+                    <div class="mt-2 h-2.5 rounded-full bg-gray-200 dark:bg-gray-800">
+                      <div
+                        class="h-2.5 rounded-full bg-brand-500"
+                        [style.width.%]="getPersonCompletionPercent(person)"
+                      ></div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                    {{ formatDate(person.validUntil) }}
+                  </td>
+                  <td class="px-4 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                    {{ formatDateTime(person.lastUpdate) }}
+                  </td>
+                  <td class="px-4 py-4 align-top text-sm text-gray-700 dark:text-gray-300">
+                    {{ getPersonLastLinkText(person) }}
+                  </td>
+                  <td class="px-4 py-4 align-top">
+                    <div class="flex justify-center gap-2">
+                      <button
+                        type="button"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-brand-600 transition hover:border-brand-300 hover:bg-brand-50 dark:border-gray-700 dark:text-brand-300 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+                        aria-label="Ver expediente de persona"
+                        title="Ver expediente"
+                        (click)="openPersonRecord(person)"
+                      >
+                        <lucide-icon [img]="FolderOpen" class="h-4 w-4"></lucide-icon>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-sky-700 transition hover:border-sky-300 hover:bg-sky-50 dark:border-gray-700 dark:text-sky-300 dark:hover:border-sky-500/40 dark:hover:bg-sky-500/10"
+                        aria-label="Enviar link"
+                        title="Enviar link"
+                        (click)="resendLink(person)"
+                      >
+                        <lucide-icon [img]="Send" class="h-4 w-4"></lucide-icon>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-amber-700 transition hover:border-amber-300 hover:bg-amber-50 dark:border-gray-700 dark:text-amber-300 dark:hover:border-amber-500/40 dark:hover:bg-amber-500/10"
+                        aria-label="Editar persona"
+                        title="Editar"
+                        (click)="openEditPersonModal(person)"
+                      >
+                        <lucide-icon [img]="Pencil" class="h-4 w-4"></lucide-icon>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-violet-700 transition hover:border-violet-300 hover:bg-violet-50 dark:border-gray-700 dark:text-violet-300 dark:hover:border-violet-500/40 dark:hover:bg-violet-500/10"
+                        aria-label="Ver resumen de persona"
+                        title="Ver"
+                        (click)="openPersonSummary(person)"
+                      >
+                        <lucide-icon [img]="Eye" class="h-4 w-4"></lucide-icon>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              @if (paginatedPeople.length === 0) {
+                <tr>
+                  <td colspan="8" class="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                    No hay personas registradas para este proveedor.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col gap-3 border-t border-gray-200 px-4 py-3 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Mostrando {{ peoplePageStartItem }}-{{ peoplePageEndItem }} de
+            {{ totalPeople }} personas
+          </p>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-xs text-gray-500 dark:text-gray-400">
+              Tamano
+            </label>
+            <select
+              [ngModel]="peoplePageSize"
+              (ngModelChange)="onPeoplePageSizeChange($event)"
+              class="h-9 rounded-lg border border-gray-300 bg-white px-2 text-xs text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              @for (size of peoplePageSizeOptions; track size) {
+                <option [value]="size">{{ size }}</option>
+              }
+            </select>
+
+            <button
+              type="button"
+              class="h-9 rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-45 dark:border-gray-700 dark:text-gray-300"
+              [disabled]="peopleCurrentPage <= 1"
+              (click)="goToPreviousPeoplePage()"
+            >
+              Ant.
+            </button>
+
+            <span class="min-w-16 text-center text-xs font-medium text-gray-600 dark:text-gray-300">
+              Pag {{ peopleCurrentPage }} / {{ peopleTotalPages }}
+            </span>
+
+            <button
+              type="button"
+              class="h-9 rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-45 dark:border-gray-700 dark:text-gray-300"
+              [disabled]="peopleCurrentPage >= peopleTotalPages"
+              (click)="goToNextPeoplePage()"
+            >
+              Sig.
+            </button>
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (activeTab === 'plantilla') {
+      <section class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <article class="app-bg-card-glass rounded-2xl p-5 xl:col-span-4">
+          <div class="flex items-center gap-3">
+            <span
+              class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-500/30 dark:bg-violet-500/10 dark:text-violet-300"
+            >
+              <lucide-icon [img]="LayoutTemplate" class="h-5 w-5"></lucide-icon>
+            </span>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+                {{ provider.template.name }}
+              </h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ provider.template.version }} / {{ provider.template.assignedBy }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-3">
+            <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Documentos solicitados
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                {{ requestedDocuments.length }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Datos base incluidos
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                {{ fixedDataFieldsCount }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                Campos configurables
+              </p>
+              <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+                {{ customNonDocumentFieldsCount }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              Ultima actualizacion de plantilla
+            </p>
+            <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+              {{ formatDateTime(provider.template.updatedAt) }}
+            </p>
+            <button
+              type="button"
+              class="mt-4 inline-flex h-10 items-center gap-2 rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+              (click)="openTemplateConfig()"
+            >
+              <lucide-icon [img]="LayoutTemplate" class="h-4 w-4"></lucide-icon>
+              Abrir configuracion
+            </button>
+          </div>
+        </article>
+
+        <article class="app-bg-card-glass rounded-2xl p-5 xl:col-span-8">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+                Documentacion requerida
+              </h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Aqui solo se muestran los documentos solicitados por la plantilla activa.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="inline-flex rounded-full border px-2.5 py-1 font-semibold" [ngClass]="getDocumentSourceClass('fixed')">
+                {{ fixedRequestedDocuments.length }} fijos
+              </span>
+              <span class="inline-flex rounded-full border px-2.5 py-1 font-semibold" [ngClass]="getDocumentSourceClass('optional')">
+                {{ optionalRequestedDocuments.length }} opcionales
+              </span>
+              <span class="inline-flex rounded-full border px-2.5 py-1 font-semibold" [ngClass]="getDocumentSourceClass('extra')">
+                {{ extraRequestedDocuments.length }} extra
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+            @for (document of requestedDocuments; track trackByRequestedDocument($index, document)) {
+              <article
+                class="rounded-2xl border p-4"
+                [ngClass]="getDocumentCardClass(document.source)"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                      {{ document.label }}
+                    </h3>
+                    <p class="mt-2 text-xs leading-5 text-gray-600 dark:text-gray-300">
+                      {{ document.description }}
+                    </p>
+                  </div>
+                  <span
+                    class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                    [ngClass]="getDocumentSourceClass(document.source)"
+                  >
+                    {{ getDocumentSourceLabel(document.source) }}
+                  </span>
+                </div>
+
+                <div class="mt-4 flex flex-wrap gap-2 text-[11px]">
+                  <span class="inline-flex rounded-full border border-gray-300 bg-white/80 px-2.5 py-1 font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200">
+                    {{ document.required ? 'Requerido' : 'Activado' }}
+                  </span>
+                  <span class="inline-flex rounded-full border border-gray-300 bg-white/80 px-2.5 py-1 font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-200">
+                    {{ document.removable ? 'Removible' : 'No removible' }}
+                  </span>
+                </div>
+              </article>
+            }
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40">
+            <p class="text-sm font-medium text-gray-800 dark:text-white/90">
+              La plantilla tambien incluye datos generales y campos configurables.
+            </p>
+            <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+              Esta vista del proveedor se concentra solo en los documentos solicitados.
+              Los campos de texto, numero, select o textarea se administran desde la
+              configuracion de plantilla.
+            </p>
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeTab === 'historial') {
+      <section class="app-bg-card-glass rounded-2xl p-5">
+        <div class="flex items-center gap-3">
+          <span
+            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-gray-700 dark:border-gray-800 dark:bg-gray-950/50 dark:text-gray-200"
+          >
+            <lucide-icon [img]="History" class="h-5 w-5"></lucide-icon>
+          </span>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+              Actividad reciente del proveedor
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Altas, revisiones y movimientos documentales con traza visible.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-4">
+          @for (item of provider.history; track trackByHistory($index, item)) {
+            <article class="flex gap-4">
+              <div class="flex flex-col items-center">
+                <span
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-2xl"
+                  [ngClass]="getHistoryTone(item)"
+                >
+                  @if (item.type === 'alta') {
+                    <lucide-icon [img]="Users" class="h-4 w-4"></lucide-icon>
+                  } @else if (item.type === 'revision') {
+                    <lucide-icon [img]="ShieldCheck" class="h-4 w-4"></lucide-icon>
+                  } @else if (item.type === 'documento') {
+                    <lucide-icon [img]="FolderOpen" class="h-4 w-4"></lucide-icon>
+                  } @else {
+                    <lucide-icon [img]="LayoutTemplate" class="h-4 w-4"></lucide-icon>
+                  }
+                </span>
+                <span class="mt-2 h-full w-px bg-gray-200 dark:bg-gray-800"></span>
+              </div>
+
+              <div class="mb-4 flex-1 rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                    {{ item.title }}
+                  </h3>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ formatDateTime(item.timestamp) }}
+                  </span>
+                </div>
+                <p class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  {{ item.description }}
+                </p>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    <app-modal
+      [isOpen]="isPersonFormOpen"
+      (close)="closePersonFormModal()"
+      [showCloseButton]="false"
+      className="relative m-4 flex max-h-[calc(100vh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 sm:m-0"
+    >
+      <div class="border-b border-gray-200 px-6 py-5 dark:border-gray-800 sm:px-8">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <span
+              class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+            >
+              <lucide-icon [img]="Users" class="h-5 w-5"></lucide-icon>
+            </span>
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-white/90">
+                {{ personModalTitle }}
+              </h2>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Registro inicial rapido para la persona asociada al proveedor.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
+            (click)="closePersonFormModal()"
+          >
+            <lucide-icon [img]="X" class="h-4 w-4"></lucide-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
+        <form class="space-y-5" [formGroup]="personForm" (ngSubmit)="savePerson()">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Nombre completo
+              </label>
+              <input
+                type="text"
+                formControlName="name"
+                class="h-11 w-full rounded-xl border bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isPersonControlInvalid('name')
+                    ? 'border-rose-400 dark:border-rose-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (isPersonControlInvalid('name')) {
+                <p class="mt-1 text-xs text-rose-500">
+                  Captura el nombre completo.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Correo electronico
+              </label>
+              <input
+                type="email"
+                formControlName="email"
+                class="h-11 w-full rounded-xl border bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isPersonControlInvalid('email')
+                    ? 'border-rose-400 dark:border-rose-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (isPersonControlInvalid('email')) {
+                <p class="mt-1 text-xs text-rose-500">
+                  Captura un correo valido.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Numero de telefono
+              </label>
+              <input
+                type="text"
+                formControlName="phone"
+                class="h-11 w-full rounded-xl border bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isPersonControlInvalid('phone')
+                    ? 'border-rose-400 dark:border-rose-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (isPersonControlInvalid('phone')) {
+                <p class="mt-1 text-xs text-rose-500">
+                  Captura un telefono de contacto.
+                </p>
+              }
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Puesto o actividad
+              </label>
+              <input
+                type="text"
+                formControlName="role"
+                class="h-11 w-full rounded-xl border bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isPersonControlInvalid('role')
+                    ? 'border-rose-400 dark:border-rose-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (isPersonControlInvalid('role')) {
+                <p class="mt-1 text-xs text-rose-500">
+                  Captura el puesto o actividad.
+                </p>
+              }
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40">
+            <p class="text-sm font-medium text-gray-800 dark:text-white/90">
+              Este formulario no crea el expediente completo.
+            </p>
+            <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+              Solo registra los datos principales de la persona para despues completar la
+              captura documental de forma local.
+            </p>
+          </div>
+
+          <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              class="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+              (click)="closePersonFormModal()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+            >
+              {{ personModalSubmitLabel }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </app-modal>
+
+    <app-modal
+      [isOpen]="isPersonSummaryOpen"
+      (close)="closePersonSummaryModal()"
+      [showCloseButton]="false"
+      className="relative m-4 flex max-h-[calc(100vh-2rem)] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white dark:bg-gray-900 sm:m-0"
+    >
+      @if (selectedPerson) {
+        <div class="border-b border-gray-200 px-6 py-5 dark:border-gray-800 sm:px-8">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <span
+                class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+              >
+                <lucide-icon [img]="UserRound" class="h-5 w-5"></lucide-icon>
+              </span>
+              <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white/90">
+                  {{ selectedPerson.name }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Ficha administrativa de seguimiento.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                [ngClass]="getPersonStatusClass(selectedPerson.recordStatus)"
+              >
+                {{ selectedPerson.recordStatus }}
+              </span>
+              <button
+                type="button"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-gray-500 transition hover:border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:text-gray-400 dark:hover:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
+                (click)="closePersonSummaryModal()"
+              >
+                <lucide-icon [img]="X" class="h-4 w-4"></lucide-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-6 py-6 sm:px-8 sm:py-7">
+          <div class="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <lucide-icon [img]="Mail" class="h-4 w-4"></lucide-icon>
+                Correo
+              </div>
+              <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                {{ selectedPerson.email }}
+              </p>
+            </article>
+
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <lucide-icon [img]="Phone" class="h-4 w-4"></lucide-icon>
+                Telefono
+              </div>
+              <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                {{ selectedPerson.phone }}
+              </p>
+            </article>
+
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <lucide-icon [img]="Users" class="h-4 w-4"></lucide-icon>
+                Puesto o actividad
+              </div>
+              <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                {{ selectedPerson.role }}
+              </p>
+            </article>
+
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50">
+              <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                <lucide-icon [img]="Building2" class="h-4 w-4"></lucide-icon>
+                Proveedor relacionado
+              </div>
+              <p class="mt-2 text-sm font-medium text-gray-900 dark:text-white/90">
+                {{ provider.name }}
+              </p>
+            </article>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-5 dark:border-gray-800 dark:bg-gray-950/50 lg:col-span-5">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                Estado general del expediente
+              </h3>
+              <p class="mt-3 text-3xl font-semibold text-gray-900 dark:text-white/90">
+                {{ selectedPersonCompletionPercent }}%
+              </p>
+              <div class="mt-4 h-3 rounded-full bg-gray-200 dark:bg-gray-800">
+                <div
+                  class="h-3 rounded-full bg-brand-500"
+                  [style.width.%]="selectedPersonCompletionPercent"
+                ></div>
+              </div>
+              <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                {{ selectedPerson.complianceSummary }}
+              </p>
+            </article>
+
+            <article class="rounded-2xl border border-gray-200 bg-white/80 p-5 dark:border-gray-800 dark:bg-gray-950/50 lg:col-span-7">
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                Estatus de archivos / documentos
+              </h3>
+
+              <div class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-3 dark:border-gray-800 dark:bg-gray-900/50">
+                  <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Solicitados
+                  </p>
+                  <p class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90">
+                    {{ selectedPerson.documentSummary.requested }}
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-3 dark:border-gray-800 dark:bg-gray-900/50">
+                  <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Aprobados
+                  </p>
+                  <p class="mt-2 text-lg font-semibold text-emerald-600 dark:text-emerald-300">
+                    {{ selectedPerson.documentSummary.approved }}
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-3 dark:border-gray-800 dark:bg-gray-900/50">
+                  <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Pendientes
+                  </p>
+                  <p class="mt-2 text-lg font-semibold text-amber-600 dark:text-amber-300">
+                    {{ selectedPerson.documentSummary.pending }}
+                  </p>
+                </div>
+                <div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-3 dark:border-gray-800 dark:bg-gray-900/50">
+                  <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Observados
+                  </p>
+                  <p class="mt-2 text-lg font-semibold text-rose-600 dark:text-rose-300">
+                    {{ selectedPerson.documentSummary.observed }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40">
+                <p class="text-sm font-medium text-gray-800 dark:text-white/90">
+                  Resumen breve de cumplimiento
+                </p>
+                <p class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                  {{ selectedPerson.complianceSummary }}
+                </p>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                  Ultimo envio de liga: {{ getPersonLastLinkText(selectedPerson) }}
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              class="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+              (click)="closePersonSummaryModal()"
+            >
+              Cerrar
+            </button>
+            <button
+              type="button"
+              class="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+              (click)="openPersonRecord(selectedPerson)"
+            >
+              <lucide-icon [img]="FolderOpen" class="h-4 w-4"></lucide-icon>
+              Ver expediente
+            </button>
+          </div>
+        </div>
+      }
+    </app-modal>
+  </div>
+} @else {
+  <div class="min-h-[calc(100vh-6rem)] pb-4">
+    <section
+      class="app-bg-card-glass flex min-h-[360px] flex-col items-center justify-center rounded-2xl px-6 py-10 text-center"
+    >
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">
+        Proveedor no disponible
+      </h1>
+      <p class="mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400">
+        El registro solicitado no se encontro dentro del padron local de expediente.
+      </p>
+      <a
+        [routerLink]="['/expediente/proveedores']"
+        class="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+      >
+        <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+        Regresar al listado
+      </a>
+    </section>
+  </div>
+}

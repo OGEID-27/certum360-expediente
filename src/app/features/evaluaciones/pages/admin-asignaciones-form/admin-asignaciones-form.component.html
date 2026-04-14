@@ -1,0 +1,900 @@
+﻿<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden">
+  <app-component-card
+    [title]="pageTitle"
+    [titleIcon]="editingAssignmentId ? Pencil : Plus"
+    titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+    desc="Configura cliente, certificacion, cuestionarios y asignaciones por usuario en localStorage."
+    className="admin-question-form-card"
+  >
+    <button
+      cardHeaderActions
+      type="button"
+      class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+      (click)="goBack()"
+    >
+      <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+      Volver
+    </button>
+
+    <form
+      class="space-y-5"
+      [formGroup]="assignmentForm"
+      (ngSubmit)="saveAssignment()"
+    >
+      <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+        <div class="mb-4 flex items-center gap-2">
+          <lucide-icon
+            [img]="Building2"
+            class="h-4 w-4 text-brand-600 dark:text-brand-300"
+          ></lucide-icon>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">
+              1. Selecciona el cliente
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              El cliente define los usuarios disponibles para asignar.
+            </p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <span
+            class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+          >
+            <lucide-icon [img]="Search" class="h-4 w-4"></lucide-icon>
+          </span>
+          <input
+            type="text"
+            [value]="clientSearchTerm"
+            (input)="clientSearchTerm = $any($event.target).value"
+            placeholder="Buscar cliente por nombre, sector o email..."
+            class="h-11 w-full rounded-xl border border-gray-300 bg-white py-2.5 pr-4 pl-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+          />
+        </div>
+
+        <div
+          class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/50 dark:border-gray-700 dark:bg-gray-900/20"
+        >
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+          >
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              >
+                Clientes disponibles
+              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Zona scrolleable para mantener el formulario compacto.
+              </p>
+            </div>
+
+            <span
+              class="inline-flex rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              {{ filteredClients.length }} registros
+            </span>
+          </div>
+
+          <div class="max-h-[28rem] overflow-y-auto p-3">
+            <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+              @for (client of filteredClients; track client.id) {
+                <button
+                  type="button"
+                  class="flex h-full flex-col rounded-xl border p-4 text-left transition"
+                  [ngClass]="
+                    selectedClient?.id === client.id
+                      ? 'border-brand-400 bg-brand-50/70 shadow-sm dark:border-brand-500/50 dark:bg-brand-500/10'
+                      : 'border-gray-200 bg-white hover:border-brand-200 hover:bg-brand-50/40 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/5'
+                  "
+                  (click)="selectClient(client)"
+                >
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p
+                        class="text-sm font-semibold text-gray-800 break-words dark:text-white/90"
+                      >
+                        {{ client.nombreCliente }}
+                      </p>
+                      <p
+                        class="mt-1 text-xs text-gray-500 break-words dark:text-gray-400"
+                      >
+                        {{ client.sector }}
+                      </p>
+                    </div>
+
+                    <span
+                      class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                      [ngClass]="getEntityStatusClass(client.estatus)"
+                    >
+                      {{ client.estatus }}
+                    </span>
+                  </div>
+
+                  <div class="mt-4 space-y-2 text-xs text-gray-500 dark:text-gray-400">
+                    <p class="break-words">{{ client.correoPrincipal }}</p>
+                    <p>{{ client.telefono || 'Sin telefono' }}</p>
+                  </div>
+                </button>
+              }
+
+              @if (filteredClients.length === 0) {
+                <div
+                  class="rounded-xl border border-dashed border-gray-300 bg-gray-50/70 p-5 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-900/40 dark:text-gray-300 lg:col-span-2 xl:col-span-3"
+                >
+                  No hay clientes que coincidan con la busqueda.
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (selectedClient) {
+          <div
+            class="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-brand-200 bg-brand-50/60 p-4 dark:border-brand-500/40 dark:bg-brand-500/10 md:grid-cols-2"
+          >
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              >
+                Cliente seleccionado
+              </p>
+              <div class="mt-1 flex flex-wrap items-center gap-2">
+                <p class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                  {{ selectedClient.nombreCliente }}
+                </p>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getEntityStatusClass(selectedClient.estatus)"
+                >
+                  {{ selectedClient.estatus }}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              >
+                Usuarios disponibles
+              </p>
+              <p class="mt-1 text-sm font-semibold text-gray-800 dark:text-white/90">
+                {{ selectedClientUserCount }}
+              </p>
+            </div>
+          </div>
+        }
+
+        @if (hasControlError("clientId", "required")) {
+          <p class="mt-3 text-xs text-red-500">
+            Debes seleccionar un cliente.
+          </p>
+        }
+      </div>
+
+      <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+        <div class="mb-4 flex items-center gap-2">
+          <lucide-icon
+            [img]="ShieldCheck"
+            class="h-4 w-4 text-brand-600 dark:text-brand-300"
+          ></lucide-icon>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">
+              2. Selecciona la certificacion
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Al elegirla, se cargan los cuestionarios disponibles para asignar por usuario.
+            </p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <span
+            class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+          >
+            <lucide-icon [img]="Search" class="h-4 w-4"></lucide-icon>
+          </span>
+          <input
+            type="text"
+            [value]="certificationSearchTerm"
+            (input)="certificationSearchTerm = $any($event.target).value"
+            placeholder="Buscar certificacion..."
+            class="h-11 w-full rounded-xl border border-gray-300 bg-white py-2.5 pr-4 pl-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+          />
+        </div>
+
+        <div
+          class="mt-4 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50/50 dark:border-gray-700 dark:bg-gray-900/20"
+        >
+          <div
+            class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-4 py-3 dark:border-gray-700"
+          >
+            <div>
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              >
+                Certificaciones disponibles
+              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Contenedor scrolleable con grilla responsive de 1, 2 y 3 columnas.
+              </p>
+            </div>
+
+            <span
+              class="inline-flex rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              {{ filteredCertifications.length }} registros
+            </span>
+          </div>
+
+          <div class="max-h-[28rem] overflow-y-auto p-3">
+            <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+              @for (certification of filteredCertifications; track certification.id) {
+                <button
+                  type="button"
+                  class="flex h-full flex-col rounded-xl border p-4 text-left transition"
+                  [ngClass]="
+                    selectedCertification?.id === certification.id
+                      ? 'border-brand-400 bg-brand-50/70 shadow-sm dark:border-brand-500/50 dark:bg-brand-500/10'
+                      : 'border-gray-200 bg-white hover:border-brand-200 hover:bg-brand-50/40 dark:border-gray-700 dark:bg-gray-900 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/5'
+                  "
+                  (click)="selectCertification(certification)"
+                >
+                  <p
+                    class="text-sm font-semibold text-gray-800 break-words dark:text-white/90"
+                  >
+                    {{ certification.nombre }}
+                  </p>
+
+                  @if (certification.descripcion) {
+                    <p
+                      class="mt-1 text-xs text-gray-500 break-words dark:text-gray-400"
+                    >
+                      {{ certification.descripcion }}
+                    </p>
+                  }
+
+                  <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <span
+                      class="inline-flex rounded-full border border-slate-300 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                    >
+                      Cuestionarios: {{ certification.questionnaireIds.length }}
+                    </span>
+                    <span
+                      class="inline-flex rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300"
+                    >
+                      Pass score: {{ certification.rules.minScore ?? 0 }}%
+                    </span>
+                  </div>
+                </button>
+              }
+
+              @if (filteredCertifications.length === 0) {
+                <div
+                  class="rounded-xl border border-dashed border-gray-300 bg-gray-50/70 p-5 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-900/40 dark:text-gray-300 lg:col-span-2 xl:col-span-3"
+                >
+                  No hay certificaciones disponibles para seleccionar.
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (hasControlError("certificationId", "required")) {
+          <p class="mt-3 text-xs text-red-500">
+            Debes seleccionar una certificacion.
+          </p>
+        }
+      </div>
+
+      <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+        <div class="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">
+              3. Cuestionarios disponibles
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Cada usuario podra responder solo el cuestionario que le asignes.
+            </p>
+          </div>
+
+          <span
+            class="rounded-full border border-gray-300 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+          >
+            {{ certificationQuestionnaires.length }} cargados
+          </span>
+        </div>
+
+        @if (selectedCertification && certificationQuestionnaires.length > 0) {
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            @for (questionnaire of certificationQuestionnaires; track questionnaire.id) {
+              <article
+                class="rounded-xl border border-gray-200 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                      {{ questionnaire.nombre }}
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                      <span
+                        class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                        [ngClass]="getAreaChipClass(questionnaire.area)"
+                      >
+                        {{ questionnaire.area }}
+                      </span>
+                      <span
+                        class="inline-flex rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                      >
+                        {{ getQuestionnairePassScore(questionnaire) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        } @else if (selectedCertification) {
+          <div
+            class="rounded-xl border border-dashed border-amber-300 bg-amber-50/70 p-5 text-sm text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300"
+          >
+            No hay cuestionarios compatibles en esta certificacion.
+          </div>
+        } @else {
+          <div
+            class="rounded-xl border border-dashed border-gray-300 bg-gray-50/70 p-5 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-900/40 dark:text-gray-300"
+          >
+            Selecciona una certificacion para ver sus cuestionarios.
+          </div>
+        }
+      </div>
+
+      <div class="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="inline-flex items-center gap-2">
+            <lucide-icon
+              [img]="Users"
+              class="h-4 w-4 text-brand-600 dark:text-brand-300"
+            ></lucide-icon>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                4. Selecciona uno o varios usuarios y asigna su cuestionario
+              </h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                La seleccion es multiple: agrega usuarios desde la derecha y ajusta su cuestionario en la izquierda.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              class="rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300"
+            >
+              Seleccion multiple
+            </span>
+            <span
+              class="rounded-full border border-gray-300 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              Usuarios: {{ selectedUsersCount }} seleccionados
+            </span>
+            <span
+              class="rounded-full border border-gray-300 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              Usuarios completos: {{ assignedCompletedCount }}/{{ selectedUsersCount }}
+            </span>
+            <span
+              class="rounded-full border border-gray-300 bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+            >
+              Cuestionarios elegidos: {{ selectedQuestionnaireCount }}
+            </span>
+
+            <button
+              type="button"
+              class="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+              [disabled]="!canAutoAssign"
+              (click)="autoAssignByArea()"
+            >
+              <lucide-icon [img]="Check" class="h-4 w-4"></lucide-icon>
+              Asignar automaticamente por area
+            </button>
+          </div>
+        </div>
+
+        @if (selectedUsersCount > 0) {
+          <div
+            class="mb-4 rounded-xl border border-brand-200 bg-brand-50/50 p-3 dark:border-brand-500/30 dark:bg-brand-500/10"
+          >
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="space-y-1">
+                <p class="text-xs font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-300">
+                  Resumen de asignacion
+                </p>
+                <p class="text-sm text-gray-700 dark:text-gray-200">
+                  {{ selectedUsersCount }} usuario(s) con {{ selectedQuestionnaireCount }}
+                  seleccion(es) de cuestionario.
+                </p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                @for (questionnaire of selectedQuestionnaireSummary; track questionnaire.id) {
+                  <span
+                    class="inline-flex items-center gap-2 rounded-full border border-white/80 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                  >
+                    <span
+                      class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                      [ngClass]="getAreaChipClass(questionnaire.area)"
+                    >
+                      {{ questionnaire.area }}
+                    </span>
+                    {{ questionnaire.nombre }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div
+            cdkDropList
+            [id]="assignedDropListId"
+            [cdkDropListData]="assignedRows"
+            [cdkDropListConnectedTo]="[availableDropListId]"
+            (cdkDropListDropped)="dropAssignedUsers($event)"
+            class="admin-drop-zone flex min-h-[360px] flex-col rounded-xl border border-gray-200 bg-gray-50/70 dark:border-gray-700 dark:bg-gray-900/40"
+            [ngClass]="assignedRows.length === 0 ? 'border-dashed' : ''"
+          >
+            <div
+              class="flex items-center justify-between border-b border-gray-200 px-3 py-3 dark:border-gray-700"
+            >
+              <div>
+                <p class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                  Usuarios seleccionados
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  Arrastra o agrega varios usuarios y marca uno o varios cuestionarios por persona.
+                </p>
+              </div>
+
+              <span
+                class="inline-flex rounded-full border border-brand-200 bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300"
+              >
+                {{ selectedUsersCount }} seleccionados
+              </span>
+            </div>
+
+            <div class="flex-1 space-y-2 overflow-auto p-3">
+              @if (assignedRows.length === 0) {
+                <div
+                  class="flex min-h-[170px] flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white/60 p-4 text-center dark:border-gray-600 dark:bg-gray-900/40"
+                >
+                  <lucide-icon
+                    [img]="Users"
+                    class="mb-2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                  ></lucide-icon>
+                  <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Aun no hay usuarios seleccionados
+                  </p>
+                </div>
+              }
+
+              @for (row of assignedRows; track row.userId) {
+                <div
+                  cdkDrag
+                  [cdkDragData]="row"
+                  class="admin-dnd-item cursor-grab rounded-lg border border-gray-200 bg-white p-3 transition-all hover:bg-gray-50 active:cursor-grabbing dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-white/5"
+                  [ngClass]="
+                    justAddedUserId === row.userId
+                      ? 'ring-2 ring-brand-300 dark:ring-brand-500/60'
+                      : ''
+                  "
+                >
+                  <div *cdkDragPlaceholder class="admin-dnd-placeholder"></div>
+
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="flex min-w-0 items-start gap-3">
+                      <span
+                        class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-200 bg-brand-50 text-sm font-semibold text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                      >
+                        {{ row.fullName.slice(0, 1).toUpperCase() }}
+                      </span>
+
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span
+                            cdkDragHandle
+                            class="text-gray-400 dark:text-gray-500"
+                          >
+                            <lucide-icon
+                              [img]="GripVertical"
+                              class="h-4 w-4"
+                            ></lucide-icon>
+                          </span>
+                          <p
+                            class="text-sm font-medium text-gray-800 break-words dark:text-white/90"
+                          >
+                            {{ row.fullName }}
+                          </p>
+                        </div>
+                        <p
+                          class="mt-1 text-xs text-gray-500 break-words dark:text-gray-400"
+                        >
+                          {{ row.email }}
+                        </p>
+
+                        <div class="mt-2 flex flex-wrap gap-2">
+                          <span
+                            class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                            [ngClass]="getAreaChipClass(row.area)"
+                          >
+                            {{ row.area }}
+                          </span>
+                          <span
+                            class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                            [ngClass]="getEntityStatusClass(row.status)"
+                          >
+                            {{ row.status }}
+                          </span>
+                          <span
+                            class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                            [ngClass]="getAssignmentStatusClass(row)"
+                          >
+                            {{ getAssignmentStatusLabel(row) }}
+                          </span>
+                          @if (isAreaMismatch(row)) {
+                            <span
+                              class="inline-flex rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300"
+                            >
+                              Area distinta
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-300 text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-300 dark:hover:bg-red-500/10"
+                      title="Quitar usuario"
+                      (click)="removeAssignedUser(row)"
+                    >
+                      <lucide-icon [img]="Trash2" class="h-4 w-4"></lucide-icon>
+                    </button>
+                  </div>
+
+                  <div class="mt-3">
+                    <label
+                      class="mb-1.5 block text-sm font-bold text-gray-700 dark:text-gray-300"
+                    >
+                      Cuestionarios asignados
+                    </label>
+                    <div
+                      class="rounded-xl border border-gray-200 bg-gray-50/70 p-3 dark:border-gray-800 dark:bg-gray-950/30"
+                    >
+                      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                          Marca uno o varios cuestionarios para este usuario.
+                        </p>
+
+                        <div class="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            class="inline-flex h-8 items-center rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-600 transition hover:bg-white dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
+                            (click)="selectAllQuestionnaires(row)"
+                          >
+                            Seleccionar todos
+                          </button>
+                          <button
+                            type="button"
+                            class="inline-flex h-8 items-center rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-600 transition hover:bg-white dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
+                            (click)="clearQuestionnaires(row)"
+                          >
+                            Limpiar
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="grid max-h-56 grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
+                        @for (questionnaire of getQuestionnaireOptionsForRow(row); track questionnaire.id) {
+                          <button
+                            type="button"
+                            class="rounded-xl border p-3 text-left transition"
+                            [ngClass]="getQuestionnaireSelectionClass(row, questionnaire)"
+                            (click)="toggleQuestionnaireSelection(row, questionnaire.id)"
+                          >
+                            <div class="flex items-start justify-between gap-3">
+                              <div class="min-w-0">
+                                <p class="text-sm font-semibold break-words">
+                                  {{ questionnaire.nombre }}
+                                </p>
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                  <span
+                                    class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                                    [ngClass]="getAreaChipClass(questionnaire.area)"
+                                  >
+                                    {{ questionnaire.area }}
+                                  </span>
+                                  <span
+                                    class="inline-flex rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                  >
+                                    {{ getQuestionnairePassScore(questionnaire) }}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <span
+                                class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[11px] font-bold"
+                                [ngClass]="
+                                  isQuestionnaireSelected(row, questionnaire.id)
+                                    ? 'border-brand-400 bg-brand-500 text-white dark:border-brand-400 dark:bg-brand-500'
+                                    : 'border-gray-300 bg-white text-transparent dark:border-gray-600 dark:bg-gray-900'
+                                "
+                              >
+                                <lucide-icon [img]="Check" class="h-3.5 w-3.5"></lucide-icon>
+                              </span>
+                            </div>
+                          </button>
+                        }
+                      </div>
+
+                      <div class="mt-3 flex flex-wrap gap-2">
+                        @for (questionnaire of getSelectedQuestionnairesForRow(row); track questionnaire.id) {
+                          <span
+                            class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-[11px] font-semibold text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300"
+                          >
+                            {{ questionnaire.nombre }}
+                            <button
+                              type="button"
+                              class="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white/70 text-brand-700 transition hover:bg-white dark:bg-gray-900/70 dark:text-brand-300"
+                              (click)="toggleQuestionnaireSelection(row, questionnaire.id)"
+                              [attr.aria-label]="'Quitar ' + questionnaire.nombre"
+                            >
+                              <lucide-icon [img]="X" class="h-3 w-3"></lucide-icon>
+                            </button>
+                          </span>
+                        }
+
+                        @if (getSelectedQuestionnairesForRow(row).length === 0) {
+                          <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Sin cuestionarios seleccionados.
+                          </p>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div
+            cdkDropList
+            [id]="availableDropListId"
+            [cdkDropListData]="filteredAvailableRows"
+            [cdkDropListConnectedTo]="[assignedDropListId]"
+            [cdkDropListSortingDisabled]="true"
+            (cdkDropListDropped)="dropAvailableUsers($event)"
+            class="admin-drop-zone flex min-h-[360px] flex-col rounded-xl border border-gray-200 bg-gray-50/70 dark:border-gray-700 dark:bg-gray-900/40"
+          >
+            <div class="border-b border-gray-200 px-3 py-3 dark:border-gray-700">
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <div>
+                  <p class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                    Usuarios disponibles
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Puedes agregar uno o varios usuarios desde esta columna.
+                  </p>
+                </div>
+
+                <span
+                  class="inline-flex rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                >
+                  {{ availableUsersCount }} disponibles
+                </span>
+              </div>
+
+              <div class="relative">
+                <span
+                  class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                >
+                  <lucide-icon [img]="Search" class="h-4 w-4"></lucide-icon>
+                </span>
+                <input
+                  type="text"
+                  [value]="availableUsersSearchTerm"
+                  (input)="availableUsersSearchTerm = $any($event.target).value"
+                  placeholder="Buscar usuario..."
+                  class="h-9 w-full rounded-lg border border-gray-300 bg-white py-2 pr-3 pl-9 text-xs text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+            </div>
+
+            <div class="flex-1 space-y-2 overflow-auto p-3">
+              @if (!selectedClient) {
+                <div
+                  class="flex min-h-[170px] flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white/60 p-4 text-center dark:border-gray-600 dark:bg-gray-900/40"
+                >
+                  <lucide-icon
+                    [img]="Building2"
+                    class="mb-2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                  ></lucide-icon>
+                  <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Selecciona un cliente para cargar sus usuarios.
+                  </p>
+                </div>
+              } @else if (filteredAvailableRows.length === 0) {
+                <div
+                  class="flex min-h-[170px] flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white/60 p-4 text-center dark:border-gray-600 dark:bg-gray-900/40"
+                >
+                  <lucide-icon
+                    [img]="Search"
+                    class="mb-2 h-5 w-5 text-gray-400 dark:text-gray-500"
+                  ></lucide-icon>
+                  <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    No hay usuarios disponibles para agregar.
+                  </p>
+                </div>
+              }
+
+              @for (row of filteredAvailableRows; track row.userId) {
+                <div
+                  cdkDrag
+                  [cdkDragData]="row"
+                  class="admin-dnd-item cursor-grab rounded-lg border border-gray-200 bg-white p-3 transition-all hover:bg-gray-50 active:cursor-grabbing dark:border-gray-700 dark:bg-gray-900 dark:hover:bg-white/5"
+                >
+                  <div *cdkDragPlaceholder class="admin-dnd-placeholder"></div>
+
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p
+                        class="text-sm font-medium text-gray-800 break-words dark:text-white/90"
+                      >
+                        {{ row.fullName }}
+                      </p>
+                      <p
+                        class="mt-1 text-xs text-gray-500 break-words dark:text-gray-400"
+                      >
+                        {{ row.email }}
+                      </p>
+                      <div class="mt-2 flex flex-wrap gap-2">
+                        <span
+                          class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                          [ngClass]="getAreaChipClass(row.area)"
+                        >
+                          {{ row.area }}
+                        </span>
+                        <span
+                          class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                          [ngClass]="getEntityStatusClass(row.status)"
+                        >
+                          {{ row.status }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="inline-flex h-8 items-center gap-1 rounded-lg border border-brand-300 px-2 text-xs font-medium text-brand-600 transition hover:bg-brand-50 dark:border-brand-500/50 dark:text-brand-300 dark:hover:bg-brand-500/10"
+                      title="Agregar usuario"
+                      (click)="addUserFromAvailable(row)"
+                    >
+                      <lucide-icon [img]="Plus" class="h-3.5 w-3.5"></lucide-icon>
+                      Agregar
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (hasControlError("assignedUserIds", "required")) {
+          <p class="mt-3 text-xs text-red-500">
+            Debes asignar al menos un usuario.
+          </p>
+        }
+
+        @if (hasIncompleteAssignments) {
+          <p class="mt-3 text-xs text-amber-600 dark:text-amber-300">
+            Hay usuarios seleccionados sin cuestionario asignado. Completa la asignacion antes de guardar.
+          </p>
+        }
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700 lg:grid-cols-3">
+        <div>
+          <label
+            class="mb-1.5 block text-sm font-bold text-gray-700 dark:text-gray-300"
+          >
+            Moneda <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="currency"
+            class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+          >
+            <option value="MXN">MXN</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            class="mb-1.5 block text-sm font-bold text-gray-700 dark:text-gray-300"
+          >
+            Precio <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span
+              class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-brand-500"
+            >
+              <lucide-icon [img]="BadgeDollarSign" class="h-4 w-4"></lucide-icon>
+            </span>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              formControlName="price"
+              class="h-11 w-full rounded-lg border bg-white pr-4 pl-10 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isControlInvalid('price')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          @if (hasControlError("price", "required")) {
+            <p class="mt-1 text-xs text-red-500">El precio es obligatorio.</p>
+          }
+          @if (hasControlError("price", "min")) {
+            <p class="mt-1 text-xs text-red-500">
+              El precio debe ser mayor a 0.
+            </p>
+          }
+        </div>
+
+        <div>
+          <label
+            class="mb-1.5 block text-sm font-bold text-gray-700 dark:text-gray-300"
+          >
+            Estatus de pago <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="paymentStatus"
+            class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+          >
+            @for (status of paymentStatusOptions; track status) {
+              <option [value]="status">{{ getPaymentStatusLabel(status) }}</option>
+            }
+          </select>
+
+          @if (assignmentForm.get('paymentStatus')?.value === 'PAID') {
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Al guardar se registrara `paidAt` con la fecha actual.
+            </p>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-end gap-3">
+        <button
+          type="button"
+          class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"
+          (click)="goBack()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="inline-flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="hasIncompleteAssignments"
+        >
+          <lucide-icon [img]="Check" class="h-4 w-4"></lucide-icon>
+          Guardar
+        </button>
+      </div>
+    </form>
+  </app-component-card>
+</div>

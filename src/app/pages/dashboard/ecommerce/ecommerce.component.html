@@ -1,0 +1,567 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <section
+    class="relative mb-6 overflow-hidden rounded-[30px] border border-white/30 px-6 py-0 text-white shadow-[0_28px_80px_-36px_rgba(58,76,255,0.75)] backdrop-blur-xl dark:border-white/10"
+    style="
+      background: linear-gradient(
+        135deg,
+        rgba(31, 76, 255, 0.96) 0%,
+        rgba(83, 63, 214, 0.95) 52%,
+        rgba(134, 92, 255, 0.92) 100%
+      );
+    "
+  >
+    <!-- luces / brillo -->
+    <div
+      class="pointer-events-none absolute inset-0 rounded-[30px] opacity-90"
+      style="
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(255, 255, 255, 0.22),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(255, 255, 255, 0.12),
+            transparent 32%
+          );
+      "
+    ></div>
+    <div
+      class="pointer-events-none absolute -top-16 right-0 h-40 w-40 rounded-full bg-white/10 blur-3xl"
+    ></div>
+    <div
+      class="pointer-events-none absolute -bottom-20 left-10 h-44 w-44 rounded-full bg-cyan-300/20 blur-3xl"
+    ></div>
+
+    <!-- layout -->
+    <div
+      class="relative grid items-center gap-8 xl:grid-cols-[1fr_460px] 2xl:grid-cols-[1fr_560px]"
+    >
+      <!-- texto -->
+      <div class="max-w-2xl space-y-4">
+        <span
+          class="inline-flex items-center rounded-full border border-white/20 bg-white/12 px-3 py-1 text-[11px] font-semibold tracking-[0.28em] text-white/90 backdrop-blur-md"
+        >
+          DASHBOARD ADMIN
+        </span>
+
+        <div class="space-y-2.5">
+          <h1
+            class="text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-[2.65rem]"
+          >
+            Bienvenid@, {{ userName }} 👋
+          </h1>
+          <p class="text-sm font-medium text-white/80 sm:text-base">
+            Resumen del sistema y actividad reciente
+          </p>
+          <p class="max-w-xl text-sm leading-6 text-white/78 sm:text-[15px]">
+            Consulta clientes, contenido de evaluaciones, certificaciones,
+            asignaciones y el estado de cobro en un solo lugar.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            class="inline-flex h-11 items-center gap-2 rounded-2xl border border-white/20 bg-white/14 px-4 text-sm font-medium text-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.7)] backdrop-blur-md transition hover:bg-white/18"
+            (click)="refreshDashboard()"
+          >
+            <lucide-icon
+              [img]="RefreshCcw"
+              class="h-4 w-4"
+              [class.animate-spin]="isLoading"
+            ></lucide-icon>
+            Actualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- imagen (centrada y “presentable”) -->
+      <div
+        class="pointer-events-none relative flex items-center justify-center"
+      >
+        <div
+          class="absolute inset-x-10 bottom-6 h-16 rounded-full bg-slate-950/25 blur-2xl"
+        ></div>
+        <img
+          [src]="heroImageSrc"
+          alt="MoonTest dashboard"
+          class="relative z-10 w-full max-w-[340px] sm:max-w-[380px] xl:max-w-none xl:w-[420px] 2xl:w-[520px] object-contain"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
+    @if (isLoading) {
+      @for (_ of kpiSkeleton; track $index) {
+        <article
+          class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+        >
+          <div class="animate-pulse space-y-4">
+            <div class="flex items-center justify-between">
+              <div
+                class="h-12 w-12 rounded-full bg-gray-200 dark:bg-white/10"
+              ></div>
+              <div
+                class="h-4 w-20 rounded-full bg-gray-200 dark:bg-white/10"
+              ></div>
+            </div>
+            <div class="h-8 w-24 rounded-lg bg-gray-200 dark:bg-white/10"></div>
+            <div class="h-4 w-32 rounded-lg bg-gray-200 dark:bg-white/10"></div>
+          </div>
+        </article>
+      }
+    } @else {
+      @for (kpi of kpis; track trackByKpi($index, kpi)) {
+        <article
+          class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <span
+              class="inline-flex h-12 w-12 items-center justify-center rounded-full ring-1"
+              [ngClass]="kpi.toneClass"
+            >
+              <lucide-icon [img]="kpi.icon" class="h-5 w-5"></lucide-icon>
+            </span>
+
+            <span
+              class="rounded-full border border-white/60 bg-white/50 px-2.5 py-1 text-[11px] font-medium text-gray-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-400"
+            >
+              MoonTest
+            </span>
+          </div>
+
+          <div class="mt-5 space-y-1.5">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ kpi.title }}
+            </p>
+            <p
+              class="font-semibold tracking-tight text-gray-900 dark:text-white/95"
+              [ngClass]="kpi.valueClass ?? 'text-2xl'"
+            >
+              {{ kpi.value }}
+            </p>
+            <p class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+              {{ kpi.detail }}
+            </p>
+          </div>
+        </article>
+      }
+    }
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+    >
+      <div class="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <p
+            class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600 dark:text-brand-300"
+          >
+            Cobranza
+          </p>
+          <h2
+            class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90"
+          >
+            Asignaciones por estatus
+          </h2>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Vista del pipeline de pago y seguimiento comercial.
+          </p>
+        </div>
+      </div>
+
+      @if (isLoading) {
+        <div class="animate-pulse space-y-4">
+          <div
+            class="mx-auto h-56 w-56 rounded-full bg-gray-200 dark:bg-white/10"
+          ></div>
+          <div class="grid grid-cols-2 gap-3">
+            @for (_ of listSkeleton; track $index) {
+              <div class="h-4 rounded bg-gray-200 dark:bg-white/10"></div>
+            }
+          </div>
+        </div>
+      } @else if (summary.totalAssignments > 0) {
+        <apx-chart
+          [series]="donutSeries"
+          [chart]="donutChart"
+          [labels]="donutLabels"
+          [legend]="donutLegend"
+          [stroke]="donutStroke"
+          [plotOptions]="donutPlotOptions"
+          [dataLabels]="donutDataLabels"
+          [tooltip]="donutTooltip"
+          [theme]="donutTheme"
+          [responsive]="donutResponsive"
+          [colors]="donutColors"
+        ></apx-chart>
+      } @else {
+        <div
+          class="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 px-6 text-center dark:border-white/10"
+        >
+          <lucide-icon
+            [img]="ClipboardList"
+            class="mb-3 h-9 w-9 text-gray-400"
+          ></lucide-icon>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+            Sin asignaciones registradas
+          </h3>
+          <p class="mt-1 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+            Cuando existan asignaciones, aqui veras la distribucion de pagos por
+            estatus.
+          </p>
+        </div>
+      }
+    </article>
+
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+    >
+      <div class="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <p
+            class="text-xs font-semibold uppercase tracking-[0.22em] text-violet-600 dark:text-violet-300"
+          >
+            Tendencia
+          </p>
+          <h2
+            class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90"
+          >
+            Actividad mensual
+          </h2>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Asignaciones creadas en los ultimos seis meses.
+          </p>
+        </div>
+      </div>
+
+      @if (isLoading) {
+        <div class="animate-pulse space-y-4">
+          <div class="h-64 rounded-2xl bg-gray-200 dark:bg-white/10"></div>
+          <div class="grid grid-cols-6 gap-2">
+            @for (_ of listSkeleton; track $index) {
+              <div class="h-4 rounded bg-gray-200 dark:bg-white/10"></div>
+            }
+          </div>
+        </div>
+      } @else if (summary.totalAssignments > 0) {
+        <apx-chart
+          [series]="activitySeries"
+          [chart]="activityChart"
+          [xaxis]="activityXAxis"
+          [yaxis]="activityYAxis"
+          [grid]="activityGrid"
+          [stroke]="activityStroke"
+          [fill]="activityFill"
+          [legend]="activityLegend"
+          [dataLabels]="activityDataLabels"
+          [tooltip]="activityTooltip"
+          [theme]="activityTheme"
+          [colors]="activityColors"
+        ></apx-chart>
+      } @else {
+        <div
+          class="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 px-6 text-center dark:border-white/10"
+        >
+          <lucide-icon
+            [img]="LayoutDashboard"
+            class="mb-3 h-9 w-9 text-gray-400"
+          ></lucide-icon>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+            Sin actividad para graficar
+          </h3>
+          <p class="mt-1 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+            La grafica mensual se activara cuando el sistema empiece a registrar
+            asignaciones.
+          </p>
+        </div>
+      }
+    </article>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 shadow-sm dark:border-white/10 xl:col-span-8"
+    >
+      <div
+        class="flex items-center justify-between gap-3 border-b border-gray-200/70 px-5 py-4 dark:border-white/10"
+      >
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+            Ultimas asignaciones
+          </h2>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Clientes, certificaciones, montos y estatus mas recientes.
+          </p>
+        </div>
+      </div>
+
+      @if (isLoading) {
+        <div class="space-y-3 px-5 py-5">
+          @for (_ of listSkeleton; track $index) {
+            <div
+              class="animate-pulse rounded-2xl border border-gray-200/60 p-4 dark:border-white/10"
+            >
+              <div class="flex items-center gap-4">
+                <div
+                  class="h-10 w-10 rounded-full bg-gray-200 dark:bg-white/10"
+                ></div>
+                <div class="flex-1 space-y-2">
+                  <div
+                    class="h-4 w-40 rounded bg-gray-200 dark:bg-white/10"
+                  ></div>
+                  <div
+                    class="h-3 w-24 rounded bg-gray-200 dark:bg-white/10"
+                  ></div>
+                </div>
+                <div
+                  class="h-8 w-16 rounded bg-gray-200 dark:bg-white/10"
+                ></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (latestAssignments.length > 0) {
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left">
+            <thead class="border-b border-gray-200/70 dark:border-white/10">
+              <tr
+                class="text-xs uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400"
+              >
+                <th class="px-5 py-3 font-medium">Cliente</th>
+                <th class="px-5 py-3 font-medium">Certificacion</th>
+                <th class="px-5 py-3 font-medium">Usuarios</th>
+                <th class="px-5 py-3 font-medium">Monto</th>
+                <th class="px-5 py-3 font-medium">Estatus</th>
+                <th class="px-5 py-3 font-medium">Fecha</th>
+                <th class="px-5 py-3 font-medium text-right">Accion</th>
+              </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              @for (
+                assignment of latestAssignments;
+                track trackByAssignment($index, assignment)
+              ) {
+                <tr
+                  class="align-middle transition hover:bg-brand-50/30 dark:hover:bg-brand-500/5"
+                >
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                      <span
+                        class="inline-grid h-11 w-11 place-items-center rounded-full bg-brand-500/12 text-xs font-semibold text-brand-700 ring-1 ring-brand-500/15 dark:bg-brand-500/16 dark:text-brand-200"
+                      >
+                        {{ getInitials(assignment.clientName) }}
+                      </span>
+
+                      <div>
+                        <p
+                          class="text-sm font-medium text-gray-900 dark:text-white/90"
+                        >
+                          {{ assignment.clientName }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                          {{
+                            assignment.client?.sector || "Sector no definido"
+                          }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    class="px-5 py-4 text-sm text-gray-700 dark:text-gray-200"
+                  >
+                    {{ assignment.certificationName }}
+                  </td>
+                  <td
+                    class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300"
+                  >
+                    {{ assignment.userCount }}
+                  </td>
+                  <td
+                    class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white/90"
+                  >
+                    {{ formatAssignmentAmount(assignment) }}
+                  </td>
+                  <td class="px-5 py-4">
+                    <span
+                      class="inline-flex rounded-full border px-2.5 py-1 text-xs font-medium"
+                      [ngClass]="
+                        getPaymentStatusClass(assignment.paymentStatus)
+                      "
+                    >
+                      {{ getPaymentStatusLabel(assignment.paymentStatus) }}
+                    </span>
+                  </td>
+                  <td
+                    class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300"
+                  >
+                    {{ assignment.createdAt | date: "dd MMM yyyy" }}
+                  </td>
+                  <td class="px-5 py-4 text-right">
+                    <button
+                      type="button"
+                      class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-300 text-gray-700 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 dark:border-gray-700 dark:text-gray-300 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10 dark:hover:text-brand-200"
+                      title="Ver asignaciones"
+                      (click)="openAssignments()"
+                    >
+                      <lucide-icon
+                        [img]="ArrowRight"
+                        class="h-4 w-4"
+                      ></lucide-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="px-5 py-10 text-center">
+          <lucide-icon
+            [img]="ClipboardList"
+            class="mx-auto mb-3 h-9 w-9 text-gray-400"
+          ></lucide-icon>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+            No hay asignaciones para mostrar
+          </h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            El tablero mostrara la actividad comercial apenas existan
+            asignaciones registradas.
+          </p>
+        </div>
+      }
+    </article>
+
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10 xl:col-span-4"
+    >
+      <div class="mb-5">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+          Certificaciones mas asignadas
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Top 5 por volumen y monto acumulado.
+        </p>
+      </div>
+
+      @if (isLoading) {
+        <div class="space-y-3">
+          @for (_ of listSkeleton; track $index) {
+            <div
+              class="animate-pulse rounded-2xl border border-gray-200/60 p-4 dark:border-white/10"
+            >
+              <div class="mb-3 flex items-center gap-3">
+                <div
+                  class="h-8 w-8 rounded-xl bg-gray-200 dark:bg-white/10"
+                ></div>
+                <div
+                  class="h-4 flex-1 rounded bg-gray-200 dark:bg-white/10"
+                ></div>
+              </div>
+              <div class="h-3 w-24 rounded bg-gray-200 dark:bg-white/10"></div>
+            </div>
+          }
+        </div>
+      } @else if (summary.topCertifications.length > 0) {
+        <div class="space-y-3">
+          @for (
+            item of summary.topCertifications;
+            track trackByTop($index, item)
+          ) {
+            <div
+              class="rounded-2xl border border-gray-200/70 p-4 transition hover:border-brand-300/50 hover:bg-brand-50/20 dark:border-white/10 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5"
+            >
+              <div class="flex items-start gap-3">
+                <span
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-gray-100 text-xs font-semibold text-gray-700 dark:bg-white/10 dark:text-gray-200"
+                >
+                  {{ $index + 1 }}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p
+                    class="truncate text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ item.name }}
+                  </p>
+                  <div
+                    class="mt-2 flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400"
+                  >
+                    <span>{{ item.assignments }} asignaciones</span>
+                    <span class="font-medium text-gray-700 dark:text-gray-300">
+                      {{ formatTopCertificationRevenue(item.revenueLabel) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="py-10 text-center">
+          <lucide-icon
+            [img]="BadgeCheck"
+            class="mx-auto mb-3 h-9 w-9 text-gray-400"
+          ></lucide-icon>
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white/90">
+            Sin ranking disponible
+          </h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            El top aparecera cuando existan certificaciones asociadas a
+            asignaciones.
+          </p>
+        </div>
+      }
+    </article>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+    @if (isLoading) {
+      @for (_ of listSkeleton; track $index) {
+        <article
+          class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-4 shadow-sm dark:border-white/10"
+        >
+          <div class="animate-pulse space-y-4">
+            <div
+              class="h-10 w-10 rounded-2xl bg-gray-200 dark:bg-white/10"
+            ></div>
+            <div class="h-6 w-16 rounded bg-gray-200 dark:bg-white/10"></div>
+            <div class="h-4 w-32 rounded bg-gray-200 dark:bg-white/10"></div>
+          </div>
+        </article>
+      }
+    } @else {
+      @for (card of healthCards; track trackByHealth($index, card)) {
+        <article
+          class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-4 shadow-sm dark:border-white/10"
+        >
+          <span
+            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1"
+            [ngClass]="card.toneClass"
+          >
+            <lucide-icon
+              [img]="getHealthIcon(card)"
+              class="h-5 w-5"
+            ></lucide-icon>
+          </span>
+
+          <div class="mt-4 space-y-1.5">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ card.label }}
+            </p>
+            <p class="text-2xl font-semibold text-gray-900 dark:text-white/95">
+              {{ card.value }}
+            </p>
+            <p class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+              {{ card.detail }}
+            </p>
+          </div>
+        </article>
+      }
+    }
+  </section>
+</div>

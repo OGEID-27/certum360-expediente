@@ -1,0 +1,453 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <div class="app-bg-card-glass space-y-4 rounded-2xl p-4 sm:p-5 lg:p-6">
+    <div
+      class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between"
+    >
+      <div class="flex items-start gap-4">
+        <span
+          class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 shadow-sm dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+        >
+          <lucide-icon [img]="ShieldAlert" class="h-7 w-7"></lucide-icon>
+        </span>
+
+        <div class="min-w-0">
+          <p
+            class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600 dark:text-brand-300"
+          >
+            {{ isAdmin ? "Gestion correctiva" : "Seguimiento operativo" }}
+          </p>
+          <h1
+            class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white/90"
+          >
+            Plan de remediacion
+          </h1>
+          <p class="mt-2 max-w-3xl text-sm text-gray-500 dark:text-gray-400">
+            {{
+              isAdmin
+                ? "Gestiona acciones correctivas derivadas de evaluaciones reprobadas, cuestionarios con incumplimiento y alertas activas de seguimiento."
+                : "Consulta tus acciones correctivas asignadas, revisa fechas limite, evidencia requerida y actualiza tu avance dentro del seguimiento."
+            }}
+          </p>
+        </div>
+      </div>
+
+      @if (isAdmin) {
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-3 xl:min-w-[540px]">
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 text-sm dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Remediaciones activas
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+              {{ activeCount }}
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 text-sm dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Casos reprobados
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+              {{ failedCasesCount }}
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 text-sm dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Alertas criticas
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-error-600 dark:text-error-300">
+              {{ criticalAlertsCount }}
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="grid grid-cols-2 gap-3 xl:min-w-[420px]">
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 text-sm dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Pendientes
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90">
+              {{ userPendingCount }}
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 text-sm dark:border-gray-800 dark:bg-gray-950/60"
+          >
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Por validar
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-brand-600 dark:text-brand-300">
+              {{ userValidationCount }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 gap-3 xl:grid-cols-12">
+      <div class="xl:col-span-5">
+        <div class="relative">
+          <span
+            class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+          >
+            <lucide-icon [img]="Search" class="h-4 w-4"></lucide-icon>
+          </span>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilters()"
+            placeholder="Buscar por ID, accion, evaluacion, usuario o categoria..."
+            class="h-11 w-full rounded-xl border border-gray-300 bg-white py-2.5 pr-4 pl-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+          />
+        </div>
+      </div>
+
+      <div class="xl:col-span-4">
+        <select
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="applyFilters()"
+          class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+        >
+          <option value="ALL">Todos los estatus</option>
+          @for (status of statusFilters; track status) {
+            @if (status !== "ALL") {
+              <option [value]="status">{{ status }}</option>
+            }
+          }
+        </select>
+      </div>
+
+      <div class="xl:col-span-3">
+        <select
+          [(ngModel)]="selectedPriority"
+          (ngModelChange)="applyFilters()"
+          class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+        >
+          <option value="ALL">Todas las prioridades</option>
+          @for (priority of priorityFilters; track priority) {
+            @if (priority !== "ALL") {
+              <option [value]="priority">{{ priority }}</option>
+            }
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (isAdmin) {
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-6">
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Remediaciones activas
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+          {{ activeCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Casos reprobados
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+          {{ failedCasesCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Vencidas
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-error-600 dark:text-error-300">
+          {{ overdueCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Pendientes de validacion
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-brand-600 dark:text-brand-300">
+          {{ pendingValidationCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          En proceso
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-blue-600 dark:text-blue-300">
+          {{ inProcessCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Alertas criticas
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-error-600 dark:text-error-300">
+          {{ criticalAlertsCount }}
+        </p>
+      </article>
+    </div>
+  } @else {
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Pendientes
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+          {{ userPendingCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          En proceso
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-blue-600 dark:text-blue-300">
+          {{ inProcessCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Vencidas
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-error-600 dark:text-error-300">
+          {{ overdueCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Completadas
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-success-600 dark:text-success-300">
+          {{ userCompletedCount }}
+        </p>
+      </article>
+      <article class="rounded-2xl border app-bg-card-glass p-4">
+        <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          Por validar
+        </p>
+        <p class="mt-2 text-2xl font-semibold text-brand-600 dark:text-brand-300">
+          {{ userValidationCount }}
+        </p>
+      </article>
+    </div>
+  }
+
+  <div class="overflow-hidden rounded-2xl border app-bg-card-glass">
+    <div
+      class="flex items-center gap-2 border-b border-gray-200 px-5 py-4 dark:border-gray-800"
+    >
+      <lucide-icon [img]="ClipboardList" class="h-4 w-4 text-brand-500"></lucide-icon>
+      <div>
+        <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">
+          {{ isAdmin ? "Casos reprobados y seguimiento" : "Mis remediaciones asignadas" }}
+        </h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{
+            isAdmin
+              ? "Solo se muestran evaluaciones reprobadas o incumplimientos que requieren accion correctiva."
+              : "Estas acciones nacen de cuestionarios o evaluaciones reprobadas vinculadas a tu seguimiento."
+          }}
+        </p>
+      </div>
+    </div>
+
+    @if (filteredCases.length > 0) {
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[1180px] text-left">
+          <thead
+            class="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
+          >
+            <tr>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                {{ isAdmin ? "Evaluacion / cuestionario" : "Accion / remediacion" }}
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                {{ isAdmin ? "Usuario / responsable" : "Relacionada con" }}
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Categoria
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Prioridad
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Fecha compromiso
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Estatus
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Evidencia
+              </th>
+              <th class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">
+                Accion
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+            @for (item of filteredCases; track item.id) {
+              <tr
+                class="bg-white/80 transition hover:bg-brand-50/30 dark:bg-transparent dark:hover:bg-brand-500/5"
+              >
+                <td class="px-4 py-4">
+                  <div class="space-y-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                        {{ isAdmin ? item.evaluationName : item.title }}
+                      </p>
+                      <span
+                        class="inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                        [ngClass]="getSourceClasses(item.sourceStatus)"
+                      >
+                        {{ item.sourceStatus }}
+                      </span>
+                      @if (item.isCriticalAlert) {
+                        <span
+                          class="inline-flex rounded-full border border-error-300 bg-error-50 px-2 py-0.5 text-[11px] font-semibold text-error-700 dark:border-error-500/40 dark:bg-error-500/10 dark:text-error-300"
+                        >
+                          Alerta critica
+                        </span>
+                      }
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ isAdmin ? item.title : item.evaluationName }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ item.id }} / {{ item.clientName }}
+                    </p>
+                  </div>
+                </td>
+
+                <td class="px-4 py-4">
+                  @if (isAdmin) {
+                    <div class="space-y-1">
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                        {{ item.assignedUserName }}
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ item.assignedUserArea }} / {{ item.assignedUserEmail }}
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Responsable: {{ item.responsibleName }}
+                      </p>
+                    </div>
+                  } @else {
+                    <div class="space-y-1">
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                        {{ item.evaluationName }}
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ item.source }} / {{ item.clientName }}
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Responsable: {{ item.responsibleName }}
+                      </p>
+                    </div>
+                  }
+                </td>
+
+                <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                  {{ item.category }}
+                </td>
+
+                <td class="px-4 py-4 text-sm">
+                  <span
+                    class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                    [ngClass]="getPriorityClasses(item.priority)"
+                  >
+                    {{ item.priority }}
+                  </span>
+                </td>
+
+                <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                  <div class="space-y-1">
+                    <p>{{ item.dueDate | date: 'mediumDate' }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ item.dueDate | date: 'shortTime' }}
+                    </p>
+                  </div>
+                </td>
+
+                <td class="px-4 py-4 text-sm">
+                  <div class="space-y-2">
+                    <span
+                      class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                      [ngClass]="getStatusClasses(item.status)"
+                    >
+                      {{ item.status }}
+                    </span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ item.progress }}% progreso
+                    </p>
+                  </div>
+                </td>
+
+                <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                  <div class="space-y-1">
+                    <p>{{ getEvidenceSummary(item) }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ item.evidenceRequired[0] }}
+                    </p>
+                  </div>
+                </td>
+
+                <td class="px-4 py-4 text-sm">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      class="inline-flex h-9 items-center justify-center rounded-lg border border-brand-300 px-3 text-xs font-medium text-brand-700 transition hover:bg-brand-50 dark:border-brand-500/30 dark:text-brand-300 dark:hover:bg-brand-500/10"
+                      (click)="openDetail(item)"
+                    >
+                      {{ getActionLabel() }}
+                    </button>
+
+                    @if (isAdmin && item.requiresValidation) {
+                      <button
+                        type="button"
+                        class="inline-flex h-9 items-center justify-center rounded-lg border border-success-300 px-3 text-xs font-medium text-success-700 transition hover:bg-success-50 dark:border-success-500/40 dark:text-success-300 dark:hover:bg-success-500/10"
+                        (click)="openDetail(item)"
+                      >
+                        Validar
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        No hay remediaciones que coincidan con los filtros actuales.
+      </div>
+    }
+  </div>
+
+  @if (isDetailOpen) {
+    <app-plan-remediacion-detail-drawer
+      [isOpen]="isDetailOpen"
+      [remediationCase]="selectedCase"
+      [role]="currentRole"
+      (closed)="closeDetail()"
+    ></app-plan-remediacion-detail-drawer>
+  }
+</div>

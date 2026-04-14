@@ -1,0 +1,762 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden">
+  <div class="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-10 lg:items-stretch">
+    <div class="min-w-0 lg:col-span-6">
+      <app-component-card
+        [title]="pageTitle"
+        [titleIcon]="editingQuestionId ? Pencil : Plus"
+        titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+        desc="Define tipo, validaciones y configuracion de respuesta."
+        className="admin-question-form-card min-w-0"
+      >
+        <button
+          cardHeaderActions
+          type="button"
+          class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+          (click)="goBack()"
+        >
+          <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+          Volver
+        </button>
+
+        <form
+          class="space-y-5"
+          [formGroup]="questionForm"
+          (ngSubmit)="saveQuestion()"
+        >
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >
+                Pregunta <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="titulo"
+                class="h-11 w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isControlInvalid('titulo')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasControlError("titulo", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  La pregunta es obligatoria.
+                </p>
+              }
+              @if (hasControlError("titulo", "maxlength")) {
+                <p class="mt-1 text-xs text-red-500">
+                  La pregunta no puede superar 180 caracteres.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >
+                Tipo de Pregunta<span class="text-red-500">*</span>
+              </label>
+              <div
+                class="flex flex-wrap gap-2 rounded-xl border p-3"
+                [ngClass]="
+                  isTypeInvalid
+                    ? 'border-red-300 bg-red-50/60 dark:border-red-500/50 dark:bg-red-500/10'
+                    : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/40'
+                "
+              >
+                @for (type of questionTypes; track type) {
+                  <button
+                    type="button"
+                    class="inline-flex min-w-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition focus:outline-hidden focus:ring-2 focus:ring-brand-500/30"
+                    [ngClass]="getTypeChipClass(type)"
+                    (click)="selectType(type)"
+                  >
+                    <lucide-icon
+                      [img]="getTypeIcon(type)"
+                      class="h-3.5 w-3.5 shrink-0"
+                    ></lucide-icon>
+                    <span class="whitespace-nowrap">{{
+                      questionTypeLabels[type]
+                    }}</span>
+                  </button>
+                }
+              </div>
+              @if (isTypeInvalid) {
+                <p class="mt-1 text-xs text-red-500">
+                  Debes seleccionar un tipo de pregunta.
+                </p>
+              }
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 lg:grid-cols-12">
+              <div class="lg:col-span-4">
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Obligatoria <span class="text-red-500">*</span>
+                </label>
+                <div
+                  class="flex items-center rounded-full border p-1"
+                  [ngClass]="
+                    isObligatoriaInvalid
+                      ? 'border-red-300 bg-red-50/60 dark:border-red-500/50 dark:bg-red-500/10'
+                      : 'border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900'
+                  "
+                >
+                  <button
+                    type="button"
+                    class="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-full px-3 text-xs font-medium transition"
+                    [ngClass]="
+                      questionForm.get('obligatoria')?.value === true
+                        ? 'bg-emerald-600 text-white shadow-sm dark:bg-emerald-500'
+                        : 'text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-500/10'
+                    "
+                    (click)="setObligatoria(true)"
+                  >
+                    <lucide-icon
+                      [img]="Check"
+                      class="h-3.5 w-3.5 shrink-0"
+                    ></lucide-icon>
+                    <span class="truncate">SI</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-full px-3 text-xs font-medium transition"
+                    [ngClass]="
+                      questionForm.get('obligatoria')?.value === false
+                        ? 'bg-rose-600 text-white shadow-sm dark:bg-rose-500'
+                        : 'text-rose-700 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10'
+                    "
+                    (click)="setObligatoria(false)"
+                  >
+                    <lucide-icon
+                      [img]="X"
+                      class="h-3.5 w-3.5 shrink-0"
+                    ></lucide-icon>
+                    <span class="truncate">NO</span>
+                  </button>
+                </div>
+                @if (isObligatoriaInvalid) {
+                  <p class="mt-1 text-xs text-red-500">
+                    Debes indicar si la pregunta es obligatoria.
+                  </p>
+                }
+              </div>
+
+              <div class="lg:col-span-8">
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Ayuda (opcional)</label
+                >
+                <input
+                  type="text"
+                  formControlName="ayuda"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+            </div>
+
+            @if (isCreateMode && !selectedType) {
+              <div
+                class="rounded-lg border border-dashed border-gray-300 bg-gray-25 p-4 text-sm text-gray-600 break-words dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+              >
+                No se ha seleccionado un tipo de pregunta.
+              </div>
+            }
+          </div>
+
+          @if (isOptionBasedType(selectedType)) {
+            @for (renderKey of [optionTypeRenderKey]; track renderKey) {
+              <div
+                class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+              >
+                <div class="flex items-center justify-between">
+                  <h4
+                    class="text-sm font-medium text-gray-800 dark:text-white/90"
+                  >
+                    Opciones
+                  </h4>
+                  <button
+                    type="button"
+                    class="text-sm text-brand-500 hover:underline"
+                    (click)="addOption()"
+                  >
+                    Agregar opcion
+                  </button>
+                </div>
+
+                @if (selectedType === "MIXTA") {
+                  <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <div>
+                      <label
+                        class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >Etiqueta Otros</label
+                      >
+                      <input
+                        type="text"
+                        formControlName="mixtaOtherLabel"
+                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >Placeholder Otros</label
+                      >
+                      <input
+                        type="text"
+                        formControlName="mixtaOtherPlaceholder"
+                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                    </div>
+                  </div>
+                  <label
+                    class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+                  >
+                    <input
+                      type="checkbox"
+                      formControlName="mixtaMultiple"
+                      class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                    />
+                    Permitir seleccionar mas de una opcion
+                  </label>
+                }
+
+                <div formArrayName="opciones" class="space-y-2">
+                  @for (
+                    option of opciones.controls;
+                    track $index;
+                    let i = $index
+                  ) {
+                    <div [formGroupName]="i" class="flex gap-2">
+                      <input
+                        type="text"
+                        formControlName="texto"
+                        placeholder="Texto de la opcion"
+                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                      <button
+                        type="button"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-red-300 text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-300 dark:hover:bg-red-500/10"
+                        (click)="removeOption(i)"
+                        aria-label="Eliminar opción"
+                      >
+                        <lucide-icon
+                          [img]="Trash2"
+                          class="h-4 w-4"
+                        ></lucide-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          }
+
+          @if (selectedType === "DICOTOMICA") {
+            <div
+              class="grid grid-cols-1 gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700 md:grid-cols-2"
+            >
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Etiqueta positiva</label
+                >
+                <input
+                  type="text"
+                  formControlName="dicotomicaTrueLabel"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Etiqueta negativa</label
+                >
+                <input
+                  type="text"
+                  formControlName="dicotomicaFalseLabel"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+            </div>
+          }
+
+          @if (selectedType === "LIKERT" || selectedType === "NOMINAL_SCALE") {
+            <div
+              class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="text-sm font-medium text-gray-800 dark:text-white/90"
+                >
+                  Niveles / Etiquetas
+                </h4>
+                <button
+                  type="button"
+                  class="text-sm text-brand-500 hover:underline"
+                  (click)="addLevel()"
+                >
+                  Agregar
+                </button>
+              </div>
+
+              <div formArrayName="levels" class="space-y-2">
+                @for (
+                  levelControl of levels.controls;
+                  track $index;
+                  let i = $index
+                ) {
+                  <div class="flex gap-2">
+                    <input
+                      type="text"
+                      [formControlName]="i"
+                      class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                    />
+
+                    <button
+                      type="button"
+                      class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-red-300 text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-300 dark:hover:bg-red-500/10"
+                      (click)="removeLevel(i)"
+                      aria-label="Eliminar opción"
+                    >
+                      <lucide-icon [img]="Trash2" class="h-4 w-4"></lucide-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+
+              @if (selectedType === "NOMINAL_SCALE") {
+                <div>
+                  <label
+                    class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                    >Orientacion</label
+                  >
+                  <select
+                    formControlName="nominalOrientation"
+                    class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                  >
+                    <option value="horizontal">Horizontal</option>
+                    <option value="vertical">Vertical</option>
+                  </select>
+                </div>
+              }
+            </div>
+          }
+
+          @if (selectedType === "NUMERIC_SCALE") {
+            <div
+              class="grid grid-cols-1 gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700 md:grid-cols-3"
+            >
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Minimo</label
+                >
+                <input
+                  type="number"
+                  formControlName="numericMin"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Maximo</label
+                >
+                <input
+                  type="number"
+                  formControlName="numericMax"
+                  max="100"
+                  (input)="clampNumberInput('numericMax', 100)"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+                @if (hasControlError("numericMax", "max")) {
+                  <p class="mt-1 text-xs text-red-500">
+                    El maximo permitido es 100.
+                  </p>
+                }
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Paso</label
+                >
+                <input
+                  type="number"
+                  formControlName="numericStep"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+            </div>
+          }
+
+          @if (selectedType === "FILTER") {
+            <div
+              class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+            >
+              <div class="flex items-center justify-between">
+                <h4
+                  class="text-sm font-medium text-gray-800 dark:text-white/90"
+                >
+                  Reglas condicionales (dummy)
+                </h4>
+                <button
+                  type="button"
+                  class="text-sm text-brand-500 hover:underline"
+                  (click)="addRule(availableRuleAnswerOptions[0]?.id ?? '')"
+                >
+                  Agregar regla
+                </button>
+              </div>
+
+              <div formArrayName="rules" class="space-y-3">
+                @for (rule of rules.controls; track $index; let i = $index) {
+                  <div
+                    [formGroupName]="i"
+                    class="grid grid-cols-1 gap-2 rounded-lg border border-gray-200 p-3 dark:border-gray-700 md:grid-cols-12"
+                  >
+                    <div class="md:col-span-4">
+                      <label
+                        class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >Si responde</label
+                      >
+                      <select
+                        formControlName="answerValue"
+                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      >
+                        @for (
+                          option of availableRuleAnswerOptions;
+                          track option.id
+                        ) {
+                          <option [value]="option.id">
+                            {{ option.texto }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+
+                    <div class="md:col-span-4">
+                      <label
+                        class="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >Ir a pregunta ID</label
+                      >
+                      <input
+                        type="text"
+                        formControlName="goToQuestionId"
+                        class="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                    </div>
+
+                    <div class="md:col-span-3 flex items-end">
+                      <label
+                        class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        <input
+                          type="checkbox"
+                          formControlName="endQuiz"
+                          (change)="onRuleEndQuizChange(i)"
+                          class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                        />
+                        Finalizar quiz
+                      </label>
+                    </div>
+
+                    <div class="md:col-span-1 flex items-end justify-end">
+                      <button
+                        type="button"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-red-300 text-red-600 transition hover:bg-red-50 dark:border-red-500/40 dark:text-red-300 dark:hover:bg-red-500/10"
+                        (click)="removeRule(i)"
+                        aria-label="Eliminar opción"
+                      >
+                        <lucide-icon
+                          [img]="Trash2"
+                          class="h-4 w-4"
+                        ></lucide-icon>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (selectedType === "TEXT") {
+            <div
+              class="grid grid-cols-1 gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700 md:grid-cols-3"
+            >
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Minimo</label
+                >
+                <input
+                  type="number"
+                  formControlName="textMin"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Maximo</label
+                >
+                <input
+                  type="number"
+                  formControlName="textMax"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+              <div class="md:col-span-3">
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Placeholder</label
+                >
+                <input
+                  type="text"
+                  formControlName="textPlaceholder"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+            </div>
+          }
+
+          @if (selectedType === "FILE") {
+            <div
+              class="grid grid-cols-1 gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700 md:grid-cols-2"
+            >
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Extensiones permitidas (coma separadas)</label
+                >
+                <input
+                  type="text"
+                  formControlName="fileExtensions"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+              </div>
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Tamano maximo (MB)</label
+                >
+                <input
+                  type="number"
+                  formControlName="fileMaxSize"
+                  max="30"
+                  (input)="clampNumberInput('fileMaxSize', 30)"
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+                @if (hasControlError("fileMaxSize", "max")) {
+                  <p class="mt-1 text-xs text-red-500">
+                    El tamano maximo permitido es 30 MB.
+                  </p>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"
+              (click)="cancelForm()"
+            >
+              Volver
+            </button>
+            <button
+              type="submit"
+              class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
+            >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </app-component-card>
+    </div>
+
+    <div class="min-w-0 lg:col-span-4">
+      <div class="flex min-w-0 flex-col gap-4 lg:h-full lg:min-h-0">
+        <app-component-card
+          title="Vista previa"
+          [titleIcon]="Eye"
+          titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+          desc="Renderizado reutilizando componentes de pregunta."
+          className="flex min-h-[260px] min-w-0 flex-1 flex-col overflow-hidden"
+        >
+          <div
+            class="h-full min-h-0 overflow-y-auto overflow-x-hidden pr-1 scrollbar-thin-dark"
+          >
+            @if (!selectedType) {
+              <div
+                class="rounded-lg border border-dashed border-gray-300 bg-gray-25 p-4 text-sm text-gray-600 break-words dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+              >
+                Selecciona un tipo para visualizar la previsualizacion.
+              </div>
+            } @else {
+              @for (renderKey of [optionTypeRenderKey]; track renderKey) {
+                @switch (selectedType) {
+                  @case ("MULTIPLE") {
+                    <app-question-multiple
+                      [question]="previewQuestion"
+                      [control]="previewMultipleControl"
+                    ></app-question-multiple>
+                  }
+                  @case ("TEXT") {
+                    <app-question-text
+                      [question]="previewQuestion"
+                      [control]="previewTextControl"
+                    ></app-question-text>
+                  }
+                  @case ("FILE") {
+                    <app-question-file
+                      [question]="previewQuestion"
+                      [control]="previewFileControl"
+                    ></app-question-file>
+                  }
+                  @case ("MIXTA") {
+                    <app-question-mixta
+                      [question]="previewQuestion"
+                      [control]="previewMixtaControl"
+                    ></app-question-mixta>
+                  }
+                  @case ("DICOTOMICA") {
+                    <app-question-dicotomica
+                      [question]="previewQuestion"
+                      [control]="previewDicotomicaControl"
+                    ></app-question-dicotomica>
+                  }
+                  @case ("MULTIPLE_SELECT") {
+                    <app-question-multiple-select
+                      [question]="previewQuestion"
+                      [control]="previewMultipleSelectControl"
+                    ></app-question-multiple-select>
+                  }
+                  @case ("RANKING") {
+                    <app-question-ranking
+                      [question]="previewQuestion"
+                      [control]="previewRankingControl"
+                    ></app-question-ranking>
+                  }
+                  @case ("LIKERT") {
+                    <app-question-likert
+                      [question]="previewQuestion"
+                      [control]="previewLikertControl"
+                    ></app-question-likert>
+                  }
+                  @case ("NUMERIC_SCALE") {
+                    <app-question-numeric-scale
+                      [question]="previewQuestion"
+                      [control]="previewNumericControl"
+                    ></app-question-numeric-scale>
+                  }
+                  @case ("NOMINAL_SCALE") {
+                    <app-question-nominal-scale
+                      [question]="previewQuestion"
+                      [control]="previewNominalControl"
+                    ></app-question-nominal-scale>
+                  }
+                  @case ("FILTER") {
+                    <app-question-filter
+                      [question]="previewQuestion"
+                      [control]="previewFilterControl"
+                    ></app-question-filter>
+                  }
+                }
+              }
+            }
+          </div>
+        </app-component-card>
+
+        <app-component-card
+          title="Leyenda de tipos de pregunta"
+          [titleIcon]="BookOpen"
+          titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+          desc="Guia rapida basada en el tipo seleccionado."
+          className="flex min-h-[260px] min-w-0 flex-1 flex-col overflow-hidden"
+        >
+          <div
+            class="h-full min-h-0 overflow-y-auto overflow-x-hidden pr-1 scrollbar-thin-dark"
+          >
+            @if (selectedLegend; as legend) {
+              <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                  >
+                    <lucide-icon
+                      [img]="getTypeIcon(selectedTypeForPreview)"
+                      class="h-4 w-4"
+                    ></lucide-icon>
+                  </span>
+                  <p
+                    class="text-sm font-semibold text-gray-800 break-words dark:text-white/90"
+                  >
+                    {{ legend.title }}
+                  </p>
+                </div>
+
+                <div>
+                  <p
+                    class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    Como funciona
+                  </p>
+                  <ul
+                    class="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-gray-700 dark:text-gray-300"
+                  >
+                    @for (item of legend.how; track item) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
+                </div>
+
+                <div>
+                  <p
+                    class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    Ejemplo
+                  </p>
+                  <div
+                    class="mt-1 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900/40"
+                  >
+                    <p
+                      class="text-sm font-medium leading-relaxed text-gray-800 break-words dark:text-white/90"
+                    >
+                      {{ legend.example.question }}
+                    </p>
+                    @if (legend.example.options?.length) {
+                      <ul
+                        class="mt-2 list-disc space-y-1 pl-5 text-xs leading-relaxed text-gray-600 dark:text-gray-300"
+                      >
+                        @for (option of legend.example.options; track option) {
+                          <li class="break-words">{{ option }}</li>
+                        }
+                      </ul>
+                    }
+                    @if (legend.example.note) {
+                      <p
+                        class="mt-2 text-xs leading-relaxed text-gray-500 break-words dark:text-gray-400"
+                      >
+                        {{ legend.example.note }}
+                      </p>
+                    }
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div
+                class="rounded-lg border border-dashed border-gray-300 bg-gray-25 p-4 text-sm text-gray-600 break-words dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+              >
+                Selecciona un tipo para ver la leyenda.
+              </div>
+            }
+          </div>
+        </app-component-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,468 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <app-component-card
+    [title]="pageTitle"
+    [titleIcon]="providerId ? Pencil : Plus"
+    titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+    [desc]="pageDescription"
+  >
+    <button
+      cardHeaderActions
+      type="button"
+      class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+      (click)="goBack()"
+    >
+      <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+      Volver
+    </button>
+
+    <form class="space-y-5" [formGroup]="form" (ngSubmit)="saveProvider()">
+      <section
+        class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h3
+              class="text-lg font-semibold text-gray-800 dark:text-white/90 sm:text-xl"
+            >
+              Datos generales
+            </h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Configura identidad comercial, contacto y estado operativo.
+            </p>
+          </div>
+
+          <span
+            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+          >
+            <lucide-icon [img]="Building2" class="h-5 w-5"></lucide-icon>
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div class="space-y-4 md:col-span-8">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Nombre comercial / proveedor
+                  <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="name"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('name')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                />
+                @if (hasError("name", "required")) {
+                  <p class="mt-1 text-xs text-red-500">
+                    El nombre del proveedor es obligatorio.
+                  </p>
+                }
+              </div>
+
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Estatus <span class="text-red-500">*</span>
+                </label>
+                <select
+                  formControlName="status"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('status')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                >
+                  @for (status of statusOptions; track status) {
+                    <option [value]="status">{{ status }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >
+                Razon social <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="businessName"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('businessName')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Giro o tipo de servicio
+                  <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  list="provider-service-types"
+                  formControlName="serviceType"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('serviceType')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                />
+
+                <datalist id="provider-service-types">
+                  @for (serviceType of serviceTypeOptions; track serviceType) {
+                    <option [value]="serviceType">{{ serviceType }}</option>
+                  }
+                </datalist>
+              </div>
+
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Nombre del contacto principal
+                  <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  formControlName="contactName"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('contactName')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Correo <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  formControlName="contactEmail"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('contactEmail')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                />
+                @if (hasError("contactEmail", "email")) {
+                  <p class="mt-1 text-xs text-red-500">
+                    Captura un correo valido.
+                  </p>
+                }
+              </div>
+
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Telefono
+                </label>
+                <input
+                  type="text"
+                  formControlName="contactPhone"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('contactPhone')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                />
+                @if (hasError("contactPhone", "pattern")) {
+                  <p class="mt-1 text-xs text-red-500">
+                    Captura un telefono valido.
+                  </p>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >
+                Observaciones generales
+              </label>
+              <textarea
+                rows="4"
+                formControlName="observations"
+                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="md:col-span-4">
+            <div
+              class="h-full rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40"
+            >
+              <div class="flex h-full flex-col justify-between gap-4">
+                <div>
+                  <p class="text-sm font-semibold text-gray-800 dark:text-white/90">
+                    Imagen / foto del proveedor
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Puedes cargar logo o imagen para reforzar identificacion
+                    visual dentro del expediente.
+                  </p>
+                </div>
+
+                <div
+                  class="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-dashed border-brand-200 bg-white/80 p-5 text-center dark:border-brand-500/30 dark:bg-gray-950/50"
+                >
+                  @if (logoPreviewUrl) {
+                    <img
+                      [src]="logoPreviewUrl"
+                      alt="Vista previa del proveedor"
+                      class="h-28 w-28 rounded-full object-cover object-center ring-2 ring-brand-200 dark:ring-brand-500/30"
+                    />
+                  } @else {
+                    <span
+                      class="inline-grid h-28 w-28 place-items-center rounded-full border border-brand-200 bg-brand-500/15 text-3xl font-semibold tracking-[0.18em] text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/20 dark:text-brand-200"
+                    >
+                      {{ providerLetters }}
+                    </span>
+                  }
+
+                  <label
+                    for="provider-image-input"
+                    class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-300 hover:bg-brand-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+                  >
+                    <lucide-icon [img]="Camera" class="h-4 w-4"></lucide-icon>
+                    {{ logoPreviewUrl ? 'Cambiar imagen' : 'Agregar imagen' }}
+                  </label>
+
+                  <input
+                    id="provider-image-input"
+                    type="file"
+                    accept="image/*"
+                    class="sr-only"
+                    (change)="onImageSelected($event)"
+                  />
+
+                  @if (logoPreviewUrl) {
+                    <button
+                      type="button"
+                      class="mt-3 text-xs font-medium text-gray-500 transition hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      (click)="removeImage()"
+                    >
+                      Quitar imagen
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        formGroupName="fiscalData"
+        class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+      >
+        <div>
+          <h3
+            class="text-lg font-semibold text-gray-800 dark:text-white/90 sm:text-xl"
+          >
+            Datos fiscales
+          </h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Organiza informacion fiscal y de domicilio para una captura
+            administrativa consistente.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              RFC <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="rfc"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm uppercase text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.rfc')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+            @if (hasError("fiscalData.rfc", "pattern")) {
+              <p class="mt-1 text-xs text-red-500">Captura un RFC valido.</p>
+            }
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Regimen fiscal <span class="text-red-500">*</span>
+            </label>
+            <select
+              formControlName="taxRegime"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.taxRegime')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            >
+              <option value="" disabled>Selecciona regimen fiscal</option>
+              @for (regime of taxRegimeOptions; track regime) {
+                <option [value]="regime">{{ regime }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="md:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Domicilio fiscal <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="taxAddress"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.taxAddress')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Codigo postal <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="postalCode"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.postalCode')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+            @if (hasError("fiscalData.postalCode", "pattern")) {
+              <p class="mt-1 text-xs text-red-500">
+                El codigo postal debe tener 5 digitos.
+              </p>
+            }
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Ciudad <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="city"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.city')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Estado <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="state"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.state')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Pais <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="country"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('fiscalData.country')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+            >
+              Uso o clasificacion fiscal
+            </label>
+            <input
+              type="text"
+              formControlName="fiscalClassification"
+              class="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-600"
+        >
+          {{ submitLabel }}
+        </button>
+      </div>
+    </form>
+  </app-component-card>
+</div>

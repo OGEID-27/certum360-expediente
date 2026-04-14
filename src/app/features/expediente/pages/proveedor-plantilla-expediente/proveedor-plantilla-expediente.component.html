@@ -1,0 +1,992 @@
+@if (provider) {
+  <div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+    <section class="app-bg-card-glass rounded-2xl p-4 sm:p-5 lg:p-6">
+      <div
+        class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between"
+      >
+        <div class="flex items-start gap-4">
+          <span
+            class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 text-violet-700 shadow-sm dark:border-violet-500/30 dark:bg-violet-500/10 dark:text-violet-300"
+          >
+            <lucide-icon [img]="LayoutTemplate" class="h-7 w-7"></lucide-icon>
+          </span>
+
+          <div>
+            <a
+              [routerLink]="['/expediente/proveedores', provider.id]"
+              [queryParams]="{ tab: 'plantilla' }"
+              class="inline-flex items-center gap-2 text-sm font-medium text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
+            >
+              <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+              Volver al detalle
+            </a>
+            <h1
+              class="mt-3 text-2xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              Configuracion de plantilla
+            </h1>
+            <p class="mt-2 max-w-3xl text-sm text-gray-500 dark:text-gray-400">
+              Define los datos base, documentos opcionales y campos
+              configurables que completara la persona vinculada a
+              {{ provider.name }}.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            type="button"
+            class="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+            (click)="goBack()"
+          >
+            <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+            Volver
+          </button>
+          <button
+            type="button"
+            class="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+            (click)="saveTemplate()"
+          >
+            <lucide-icon [img]="Save" class="h-4 w-4"></lucide-icon>
+            Guardar cambios
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-10 lg:items-stretch">
+      <div class="lg:col-span-6">
+        <app-component-card
+          title="Plantilla del proveedor"
+          [titleIcon]="Settings2"
+          titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+          desc="Organiza campos base, opcionales y configurables con enfoque administrativo."
+          className="min-w-0"
+        >
+          <div class="space-y-6">
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >
+                Nombre de plantilla
+              </label>
+              <input
+                type="text"
+                [formControl]="templateForm.controls.name"
+                class="h-11 w-full rounded-xl border bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  templateForm.controls.name.invalid &&
+                  templateForm.controls.name.touched
+                    ? 'border-rose-400 dark:border-rose-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+            </div>
+
+            <section
+              class="space-y-4 rounded-2xl border border-gray-200 p-4 dark:border-gray-700"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h2
+                    class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    Campos base no removibles
+                  </h2>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Siempre incluidos para el registro inicial y la identidad
+                    documental.
+                  </p>
+                </div>
+                <span
+                  class="inline-flex rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300"
+                >
+                  {{ fixedFields.length }} activos
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                @for (
+                  field of fixedFields;
+                  track trackByFieldId($index, field)
+                ) {
+                  <article
+                    class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/50"
+                  >
+                    <div class="flex items-start justify-between gap-3">
+                      <div>
+                        <h3
+                          class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                        >
+                          {{ field.label }}
+                        </h3>
+                        <p
+                          class="mt-2 text-xs leading-5 text-gray-500 dark:text-gray-400"
+                        >
+                          {{ field.description }}
+                        </p>
+                      </div>
+                      <span
+                        class="inline-flex rounded-full border border-sky-300 bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-300"
+                      >
+                        Fijo
+                      </span>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+
+            <section
+              class="space-y-4 rounded-2xl border border-gray-200 p-4 dark:border-gray-700"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h2
+                    class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    Campos base opcionales
+                  </h2>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Documentos activables o removibles segun el proveedor.
+                  </p>
+                </div>
+                <span
+                  class="inline-flex rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300"
+                >
+                  {{ optionalFields.length }} configurables
+                </span>
+              </div>
+
+              <div class="space-y-3">
+                @for (
+                  field of optionalFields;
+                  track trackByFieldId($index, field)
+                ) {
+                  <article
+                    class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+                  >
+                    <div
+                      class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <h3
+                          class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                        >
+                          {{ field.label }}
+                        </h3>
+                        <p
+                          class="mt-2 text-xs leading-5 text-gray-500 dark:text-gray-400"
+                        >
+                          {{ field.description }}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        class="inline-flex h-10 items-center rounded-full border p-1"
+                        [ngClass]="
+                          field.enabled
+                            ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-500/40 dark:bg-emerald-500/10'
+                            : 'border-gray-300 bg-gray-100 dark:border-gray-700 dark:bg-gray-900'
+                        "
+                        (click)="toggleOptionalField(field.id)"
+                      >
+                        <span
+                          class="inline-flex h-8 min-w-[74px] items-center justify-center rounded-full px-3 text-xs font-semibold"
+                          [ngClass]="
+                            field.enabled
+                              ? 'bg-emerald-600 text-white dark:bg-emerald-500'
+                              : 'text-gray-500 dark:text-gray-400'
+                          "
+                        >
+                          {{ field.enabled ? "Activo" : "Inactivo" }}
+                        </span>
+                      </button>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+
+            <section
+              class="space-y-4 rounded-2xl border border-gray-200 p-4 dark:border-gray-700"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <h2
+                    class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    Campos personalizados
+                  </h2>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Agrega informacion adicional o documentos extra sin mezclar
+                    logica de evaluaciones.
+                  </p>
+                </div>
+                <span
+                  class="inline-flex rounded-full border border-violet-300 bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300"
+                >
+                  {{ customFields.length }} agregados
+                </span>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex flex-wrap gap-2">
+                  @for (option of fieldTypeOptions; track option.value) {
+                    <button
+                      type="button"
+                      class="inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-2 text-left text-sm font-medium transition"
+                      [ngClass]="
+                        templateForm.controls.customType.value === option.value
+                          ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-200'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+                      "
+                      (click)="selectCustomType(option.value)"
+                    >
+                      <span
+                        class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-current/15 bg-white/70 dark:bg-white/5"
+                      >
+                        <lucide-icon
+                          [img]="getCustomFieldIcon(option.value)"
+                          class="h-4 w-4"
+                        ></lucide-icon>
+                      </span>
+                      <span>{{ option.label }}</span>
+                    </button>
+                  }
+                </div>
+
+                <div
+                  class="rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 px-4 py-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+                >
+                  <span class="font-semibold text-gray-900 dark:text-white/90">
+                    {{ selectedCustomTypeOption.label }}
+                  </span>
+                  <span class="ml-2">
+                    {{ selectedCustomTypeOption.description }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label
+                    class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >
+                    Etiqueta del campo
+                  </label>
+                  <input
+                    type="text"
+                    [formControl]="templateForm.controls.customLabel"
+                    class="h-11 w-full rounded-xl border bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                    [ngClass]="
+                      isCustomControlInvalid('customLabel')
+                        ? 'border-rose-400 dark:border-rose-500'
+                        : 'border-gray-300 dark:border-gray-700'
+                    "
+                  />
+                </div>
+
+                <div>
+                  <label
+                    class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >
+                    Placeholder / referencia
+                  </label>
+                  <input
+                    type="text"
+                    [formControl]="templateForm.controls.customPlaceholder"
+                    class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                  />
+                </div>
+
+                <div class="md:col-span-2">
+                  <label
+                    class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >
+                    Descripcion
+                  </label>
+                  <textarea
+                    rows="3"
+                    [formControl]="templateForm.controls.customDescription"
+                    class="w-full rounded-xl border bg-white px-4 py-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:bg-gray-900 dark:text-white/90"
+                    [ngClass]="
+                      isCustomControlInvalid('customDescription')
+                        ? 'border-rose-400 dark:border-rose-500'
+                        : 'border-gray-300 dark:border-gray-700'
+                    "
+                  ></textarea>
+                </div>
+
+                @if (isCustomTypeSelect) {
+                  <div class="md:col-span-2">
+                    <div
+                      class="rounded-2xl border border-gray-200 p-4 dark:border-gray-700"
+                    >
+                      <div class="flex items-center justify-between gap-3">
+                        <div>
+                          <label
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                          >
+                            Opciones del select
+                          </label>
+                          <p
+                            class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                          >
+                            Cada opcion se define por separado para mantener
+                            control visual.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          class="inline-flex h-9 items-center gap-2 rounded-xl border border-brand-300 bg-brand-50 px-3 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-200 dark:hover:bg-brand-500/20"
+                          (click)="addSelectOption()"
+                        >
+                          <lucide-icon
+                            [img]="Plus"
+                            class="h-4 w-4"
+                          ></lucide-icon>
+                          Agregar opcion
+                        </button>
+                      </div>
+
+                      <div class="mt-4 space-y-3">
+                        @for (
+                          option of selectOptionDrafts;
+                          track trackBySelectOptionId($index, option);
+                          let index = $index
+                        ) {
+                          <div
+                            class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3"
+                          >
+                            <span
+                              class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                            >
+                              Opcion {{ index + 1 }}
+                            </span>
+                            <input
+                              type="text"
+                              [value]="option.value"
+                              class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                              (input)="
+                                updateSelectOption(
+                                  option.id,
+                                  $any($event.target).value
+                                )
+                              "
+                            />
+                            <button
+                              type="button"
+                              class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-rose-200 text-rose-500 transition hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                              [disabled]="selectOptionDrafts.length <= 1"
+                              (click)="removeSelectOption(option.id)"
+                            >
+                              <lucide-icon
+                                [img]="Trash2"
+                                class="h-4 w-4"
+                              ></lucide-icon>
+                            </button>
+                          </div>
+                        }
+                      </div>
+
+                      @if (selectOptionsTouched && !hasValidSelectOptions) {
+                        <p class="mt-3 text-xs text-rose-500">
+                          Agrega al menos una opcion valida para el select.
+                        </p>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (isCustomTypeFile) {
+                  <div class="md:col-span-2">
+                    <div
+                      class="rounded-2xl border border-gray-200 p-4 dark:border-gray-700"
+                    >
+                      <div>
+                        <label
+                          class="block text-sm font-medium text-gray-700 dark:text-gray-400"
+                        >
+                          Configuracion del campo archivo
+                        </label>
+                        <p
+                          class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          Parametros visuales para representar limites y
+                          formatos permitidos.
+                        </p>
+                      </div>
+
+                      <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div>
+                          <label
+                            class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                          >
+                            Limite total de peso
+                          </label>
+                          <input
+                            type="number"
+                            [formControl]="
+                              templateForm.controls.fileTotalMaxSizeMb
+                            "
+                            class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                          >
+                            Cantidad maxima de archivos
+                          </label>
+                          <input
+                            type="number"
+                            [formControl]="templateForm.controls.fileMaxCount"
+                            class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                          >
+                            Limite por archivo
+                          </label>
+                          <input
+                            type="number"
+                            [formControl]="templateForm.controls.fileMaxSizeMb"
+                            class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="mt-4">
+                        <p
+                          class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-400"
+                        >
+                          Formatos permitidos
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                          @for (
+                            format of fileFormatOptions;
+                            track format.value
+                          ) {
+                            <button
+                              type="button"
+                              class="inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition"
+                              [ngClass]="
+                                isFileFormatSelected(format.value)
+                                  ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-200'
+                                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+                              "
+                              (click)="toggleFileFormat(format.value)"
+                            >
+                              {{ format.label }}
+                            </button>
+                          }
+                        </div>
+
+                        @if (fileFormatsTouched && !hasValidFileFormats) {
+                          <p class="mt-3 text-xs text-rose-500">
+                            Selecciona al menos un formato permitido.
+                          </p>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                <label
+                  class="inline-flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300 md:col-span-2"
+                >
+                  <input
+                    type="checkbox"
+                    [formControl]="templateForm.controls.customRequired"
+                    class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                  />
+                  Marcar como obligatorio
+                </label>
+              </div>
+
+              <div class="flex justify-end">
+                <button
+                  type="button"
+                  class="inline-flex h-10 items-center gap-2 rounded-xl border border-brand-300 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-200 dark:hover:bg-brand-500/20"
+                  (click)="addCustomField()"
+                >
+                  <lucide-icon [img]="Plus" class="h-4 w-4"></lucide-icon>
+                  Agregar campo / documento
+                </button>
+              </div>
+
+              <div class="space-y-3">
+                @for (
+                  field of customFields;
+                  track trackByFieldId($index, field)
+                ) {
+                  <article
+                    class="rounded-2xl border border-gray-200 bg-white/90 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-950/60"
+                  >
+                    <div
+                      class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+                    >
+                      <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span
+                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                          >
+                            <lucide-icon
+                              [img]="getCustomFieldIcon(field.type)"
+                              class="h-4 w-4"
+                            ></lucide-icon>
+                          </span>
+                          <h3
+                            class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                          >
+                            {{ field.label }}
+                          </h3>
+                          <span
+                            class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-[11px] font-semibold text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                          >
+                            {{ getCustomTypeLabel(field.type) }}
+                          </span>
+                          <span
+                            class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                            [ngClass]="
+                              field.required
+                                ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300'
+                                : 'border-gray-300 bg-gray-100 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                            "
+                          >
+                            {{ field.required ? "Obligatorio" : "Opcional" }}
+                          </span>
+                        </div>
+
+                        <p
+                          class="mt-3 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                        >
+                          {{ field.description }}
+                        </p>
+
+                        @if (field.placeholder) {
+                          <p
+                            class="mt-2 text-xs text-gray-500 dark:text-gray-400"
+                          >
+                            Referencia: {{ field.placeholder }}
+                          </p>
+                        }
+
+                        @if (field.options?.length) {
+                          <div class="mt-3 flex flex-wrap gap-2">
+                            @for (option of field.options; track option) {
+                              <span
+                                class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              >
+                                {{ option }}
+                              </span>
+                            }
+                          </div>
+                        }
+
+                        @if (field.fileConfig) {
+                          <div class="mt-3 flex flex-wrap gap-2">
+                            @if (field.fileConfig.totalMaxSizeMb) {
+                              <span
+                                class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              >
+                                Total {{ field.fileConfig.totalMaxSizeMb }} MB
+                              </span>
+                            }
+                            @if (field.fileConfig.maxFiles) {
+                              <span
+                                class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              >
+                                Maximo {{ field.fileConfig.maxFiles }} archivos
+                              </span>
+                            }
+                            @if (field.fileConfig.maxSizePerFileMb) {
+                              <span
+                                class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                              >
+                                {{ field.fileConfig.maxSizePerFileMb }} MB por
+                                archivo
+                              </span>
+                            }
+                            @for (
+                              format of field.fileConfig.allowedFormats ?? [];
+                              track format
+                            ) {
+                              <span
+                                class="inline-flex rounded-full border border-brand-300 bg-brand-50 px-2.5 py-1 text-[11px] font-medium text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-200"
+                              >
+                                {{ format }}
+                              </span>
+                            }
+                          </div>
+                        }
+                      </div>
+
+                      <button
+                        type="button"
+                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-rose-200 text-rose-500 transition hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                        title="Eliminar campo"
+                        (click)="removeCustomField(field.id)"
+                      >
+                        <lucide-icon
+                          [img]="Trash2"
+                          class="h-4 w-4"
+                        ></lucide-icon>
+                      </button>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          </div>
+        </app-component-card>
+      </div>
+
+      <div class="lg:col-span-4">
+        <div class="flex flex-col gap-4">
+          <app-component-card
+            title="Resumen de plantilla"
+            [titleIcon]="BadgeCheck"
+            titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+            desc="Balance rapido de la configuracion actual."
+            className="min-w-0"
+          >
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Fijos
+                </p>
+                <p
+                  class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ fixedFields.length }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Opcionales activos
+                </p>
+                <p
+                  class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ activeOptionalFieldCount }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Documentos extra
+                </p>
+                <p
+                  class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ extraRequestedDocumentCount }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Version actual
+                </p>
+                <p
+                  class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ provider.template.version }}
+                </p>
+              </div>
+            </div>
+          </app-component-card>
+
+          <app-component-card
+            title="Vista previa"
+            [titleIcon]="Eye"
+            titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+            desc="Representacion visual del campo tal como se mostraria a la persona."
+            className="min-w-0"
+          >
+            <div class="space-y-4">
+              <div
+                class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/50"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Documentos requeridos
+                </p>
+                <div class="mt-3 space-y-2">
+                  @for (document of requestedDocuments; track document.id) {
+                    <div
+                      class="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-950/60"
+                    >
+                      <span
+                        class="text-sm font-medium text-gray-800 dark:text-white/90"
+                      >
+                        {{ document.label }}
+                      </span>
+                      <span
+                        class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                        [ngClass]="
+                          document.source === 'fixed'
+                            ? 'border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-300'
+                            : document.source === 'optional'
+                              ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300'
+                              : 'border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300'
+                        "
+                      >
+                        {{
+                          document.source === "fixed"
+                            ? "Fijo"
+                            : document.source === "optional"
+                              ? "Opcional"
+                              : "Extra"
+                        }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div
+                class="rounded-[28px] border border-gray-200 bg-gradient-to-br from-white via-gray-50 to-brand-50/60 p-5 shadow-sm dark:border-gray-800 dark:from-gray-950 dark:via-gray-950 dark:to-brand-500/10"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400"
+                    >
+                      Campo configurado
+                    </p>
+                    <h3
+                      class="mt-2 text-base font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{ previewCustomLabel }}
+                    </h3>
+                    <p
+                      class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                    >
+                      {{ previewCustomDescription }}
+                    </p>
+                  </div>
+                  <span
+                    class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                    [ngClass]="
+                      templateForm.controls.customRequired.value
+                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300'
+                        : 'border-gray-300 bg-gray-100 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                    "
+                  >
+                    {{
+                      templateForm.controls.customRequired.value
+                        ? "Obligatorio"
+                        : "Opcional"
+                    }}
+                  </span>
+                </div>
+
+                <div
+                  class="mt-5 rounded-3xl border border-gray-200 bg-white/90 p-4 dark:border-gray-800 dark:bg-gray-950/70"
+                >
+                  @switch (templateForm.controls.customType.value) {
+                    @case ("TEXT") {
+                      <div class="space-y-3">
+                        <label
+                          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          {{ previewCustomLabel }}
+                        </label>
+                        <input
+                          type="text"
+                          [placeholder]="previewCustomPlaceholder"
+                          class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500"
+                          disabled
+                        />
+                      </div>
+                    }
+                    @case ("NUMBER") {
+                      <div class="space-y-3">
+                        <label
+                          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          {{ previewCustomLabel }}
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500"
+                          disabled
+                        />
+                      </div>
+                    }
+                    @case ("TEXTAREA") {
+                      <div class="space-y-3">
+                        <label
+                          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          {{ previewCustomLabel }}
+                        </label>
+                        <textarea
+                          rows="4"
+                          [placeholder]="previewCustomPlaceholder"
+                          class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-500"
+                          disabled
+                        ></textarea>
+                      </div>
+                    }
+                    @case ("SELECT") {
+                      <div class="space-y-3">
+                        <label
+                          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                        >
+                          {{ previewCustomLabel }}
+                        </label>
+                        <select
+                          class="h-11 w-full rounded-xl border border-gray-300 bg-white px-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400"
+                          disabled
+                        >
+                          <option>Selecciona una opcion</option>
+                          @for (option of previewSelectOptions; track option) {
+                            <option>{{ option }}</option>
+                          }
+                        </select>
+                        <div class="flex flex-wrap gap-2">
+                          @for (option of previewSelectOptions; track option) {
+                            <span
+                              class="inline-flex rounded-full border border-gray-300 bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                            >
+                              {{ option }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    }
+                    @case ("FILE") {
+                      <div class="space-y-4">
+                        <div
+                          class="rounded-2xl border border-dashed border-brand-300 bg-brand-50/70 p-5 text-center dark:border-brand-500/40 dark:bg-brand-500/10"
+                        >
+                          <lucide-icon
+                            [img]="FileText"
+                            class="mx-auto h-8 w-8 text-brand-600 dark:text-brand-300"
+                          ></lucide-icon>
+                          <p
+                            class="mt-3 text-sm font-semibold text-gray-900 dark:text-white/90"
+                          >
+                            Arrastra archivos aqui o haz click para cargar
+                          </p>
+                          <p
+                            class="mt-2 text-xs text-gray-500 dark:text-gray-400"
+                          >
+                            Vista previa del cargador para
+                            {{ previewCustomLabel.toLowerCase() }}
+                          </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <div
+                            class="rounded-2xl border border-gray-200 bg-gray-50/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/50"
+                          >
+                            <p
+                              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                            >
+                              Limite total
+                            </p>
+                            <p
+                              class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                            >
+                              {{ previewFileConfig.totalMaxSizeMb }} MB
+                            </p>
+                          </div>
+                          <div
+                            class="rounded-2xl border border-gray-200 bg-gray-50/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/50"
+                          >
+                            <p
+                              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                            >
+                              Maximo de archivos
+                            </p>
+                            <p
+                              class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                            >
+                              {{ previewFileConfig.maxFiles }}
+                            </p>
+                          </div>
+                          <div
+                            class="rounded-2xl border border-gray-200 bg-gray-50/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/50 sm:col-span-2"
+                          >
+                            <p
+                              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                            >
+                              Restricciones visibles
+                            </p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                              <span
+                                class="inline-flex rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[11px] font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                              >
+                                {{ previewFileConfig.maxSizeMb }} MB por archivo
+                              </span>
+                              @for (
+                                format of previewFileConfig.formats;
+                                track format
+                              ) {
+                                <span
+                                  class="inline-flex rounded-full border border-brand-300 bg-brand-50 px-2.5 py-1 text-[11px] font-medium text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-200"
+                                >
+                                  {{ format }}
+                                </span>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          </app-component-card>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="min-h-[calc(100vh-6rem)] pb-4">
+    <section
+      class="app-bg-card-glass flex min-h-[360px] flex-col items-center justify-center rounded-2xl px-6 py-10 text-center"
+    >
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">
+        Proveedor no disponible
+      </h1>
+      <p class="mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400">
+        No fue posible cargar la configuracion local de plantilla para este
+        proveedor.
+      </p>
+      <a
+        [routerLink]="['/expediente/proveedores']"
+        class="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+      >
+        <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+        Regresar al listado
+      </a>
+    </section>
+  </div>
+}

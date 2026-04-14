@@ -1,0 +1,1666 @@
+@if (provider && person && recordDetail) {
+  <div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+    <section class="app-bg-card-glass rounded-2xl p-4 sm:p-5 lg:p-6">
+      <a
+        [routerLink]="backLink"
+        [queryParams]="cameFromReview ? null : { tab: 'personas' }"
+        class="inline-flex items-center gap-2 text-sm font-medium text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
+      >
+        <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+        {{ backLabel }}
+      </a>
+
+      <div class="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div class="space-y-4 xl:col-span-8">
+          <div class="flex items-start gap-4">
+            @if (personAvatarUrl) {
+              <img
+                [src]="personAvatarUrl"
+                [alt]="person.name"
+                class="h-16 w-16 shrink-0 rounded-2xl border border-brand-200 object-cover shadow-sm dark:border-brand-500/30"
+              />
+            } @else {
+              <span
+                class="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50 via-white to-sky-50 text-lg font-semibold tracking-[0.18em] text-brand-700 shadow-sm dark:border-brand-500/30 dark:from-brand-500/15 dark:via-gray-950 dark:to-sky-500/10 dark:text-brand-200"
+              >
+                {{ personInitials }}
+              </span>
+            }
+
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="reviewOverview.tone"
+                >
+                  {{ reviewOverview.globalLabel }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getRecordStatusClass(person.recordStatus)"
+                >
+                  {{ person.recordStatus }}
+                </span>
+              </div>
+
+              <h1
+                class="mt-3 text-2xl font-semibold text-gray-900 dark:text-white/90"
+              >
+                {{ person.name }}
+              </h1>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {{ person.role }} / {{ provider.name }}
+              </p>
+
+              <div
+                class="mt-4 grid grid-cols-1 gap-3 text-sm text-gray-600 dark:text-gray-300 md:grid-cols-2"
+              >
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/40"
+                >
+                  <p
+                    class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    Proveedor
+                  </p>
+                  <p class="mt-2 font-medium text-gray-900 dark:text-white/90">
+                    {{ provider.businessName }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ provider.serviceType }}
+                  </p>
+                </div>
+
+                <div
+                  class="rounded-2xl border border-gray-200 bg-white/70 p-3 dark:border-gray-800 dark:bg-gray-950/40"
+                >
+                  <p
+                    class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                  >
+                    Plantilla activa
+                  </p>
+                  <p class="mt-2 font-medium text-gray-900 dark:text-white/90">
+                    {{ provider.template.name }} /
+                    {{ provider.template.version }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Actualizada
+                    {{ formatDateTime(provider.template.updatedAt) }}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="mt-4 rounded-2xl border border-gray-200 bg-white/70 p-4 dark:border-gray-800 dark:bg-gray-950/40"
+              >
+                <div
+                  class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  <lucide-icon
+                    [img]="ClipboardCheck"
+                    class="h-4 w-4 text-brand-500"
+                  ></lucide-icon>
+                  Resumen ejecutivo
+                </div>
+                <p
+                  class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300"
+                >
+                  {{ recordDetail.executiveSummary }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4">
+            @for (card of executiveCards; track card.label) {
+              <article
+                class="rounded-2xl border bg-white/80 p-4 dark:bg-gray-950/60"
+                [ngClass]="card.tone"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-xs font-semibold uppercase tracking-wide">
+                      {{ card.label }}
+                    </p>
+                    <p class="mt-3 text-lg font-semibold">
+                      {{ card.value }}
+                    </p>
+                  </div>
+                  <span
+                    class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-current/15 bg-white/70 dark:bg-white/5"
+                  >
+                    <lucide-icon
+                      [img]="card.icon"
+                      class="h-5 w-5"
+                    ></lucide-icon>
+                  </span>
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+
+        <aside class="space-y-4 xl:col-span-4">
+          <article class="app-bg-card-glass rounded-2xl p-5">
+            <div class="flex items-center gap-3">
+              <span
+                class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-gray-700 dark:border-gray-800 dark:bg-gray-950/50 dark:text-gray-200"
+              >
+                <lucide-icon [img]="ShieldCheck" class="h-5 w-5"></lucide-icon>
+              </span>
+              <div>
+                <h2
+                  class="text-lg font-semibold text-gray-900 dark:text-white/90"
+                >
+                  Estado del expediente
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Calculado con lo que se revisa en campos y documentos.
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-5 space-y-4">
+              <div
+                class="rounded-2xl border px-4 py-4"
+                [ngClass]="reviewOverview.tone"
+              >
+                <p class="text-xs font-semibold uppercase tracking-wide">
+                  Estatus actual
+                </p>
+                <p class="mt-2 text-lg font-semibold">
+                  {{ reviewOverview.globalLabel }}
+                </p>
+                <p class="mt-3 text-sm leading-6 opacity-90">
+                  {{ reviewOverview.globalDetail }}
+                </p>
+              </div>
+
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <div
+                  class="flex items-center justify-between text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  <span>Avance de revision</span>
+                  <span>{{ reviewOverview.progressPercent }}%</span>
+                </div>
+                <div class="mt-3 h-3 rounded-full bg-gray-200 dark:bg-gray-800">
+                  <div
+                    class="h-3 rounded-full bg-brand-500"
+                    [style.width.%]="reviewOverview.progressPercent"
+                  ></div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Datos aprobados
+                    </p>
+                    <p
+                      class="mt-2 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ reviewOverview.approvedFields }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Datos pendientes
+                    </p>
+                    <p
+                      class="mt-2 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ reviewOverview.pendingFields }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Docs aprobados
+                    </p>
+                    <p
+                      class="mt-2 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ reviewOverview.approvedDocuments }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Docs pendientes
+                    </p>
+                    <p
+                      class="mt-2 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{
+                        reviewOverview.pendingDocuments +
+                          reviewOverview.missingDocuments
+                      }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Correcciones
+                    </p>
+                    <p
+                      class="mt-2 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ reviewOverview.pendingCorrections }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Ultima actualizacion
+                    </p>
+                    <p
+                      class="mt-2 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ formatDateTime(recordDetail.lastUpdate) }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 dark:border-gray-700 dark:bg-gray-900/40"
+              >
+                <p
+                  class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  Fuente de verdad
+                </p>
+                <p
+                  class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                >
+                  Esta vista renderiza solo los campos y documentos definidos en
+                  la plantilla del proveedor.
+                </p>
+              </div>
+            </div>
+          </article>
+        </aside>
+      </div>
+    </section>
+
+    <section class="app-bg-card-glass rounded-2xl p-3 sm:p-4">
+      <div
+        class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+      >
+        <div class="flex flex-wrap gap-2">
+          @for (tab of tabs; track tab.id) {
+            <button
+              type="button"
+              class="inline-flex h-10 items-center rounded-full border px-4 text-sm font-medium transition"
+              [ngClass]="
+                activeTab === tab.id
+                  ? 'border-brand-500 bg-brand-500 text-white shadow-sm'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+              "
+              (click)="setActiveTab(tab.id)"
+            >
+              {{ tab.label }}
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+          (click)="saveReviewChanges()"
+        >
+          <lucide-icon [img]="Save" class="h-4 w-4"></lucide-icon>
+          Guardar cambios
+        </button>
+      </div>
+    </section>
+
+    @if (activeTab === "campos") {
+      <section class="space-y-4">
+        <article class="app-bg-card-glass rounded-2xl p-4 sm:p-5">
+          <div
+            class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+          >
+            <div>
+              <h2
+                class="text-lg font-semibold text-gray-900 dark:text-white/90"
+              >
+                Campos de la plantilla
+              </h2>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Revision individual de los campos configurados en
+                {{ provider.template.name }}.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 2xl:grid-cols-4">
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                >
+                  Total
+                </p>
+                <p
+                  class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ reviewOverview.totalFields }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 dark:border-emerald-500/30 dark:bg-emerald-500/10"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-300"
+                >
+                  Aprobados
+                </p>
+                <p
+                  class="mt-2 text-lg font-semibold text-emerald-700 dark:text-emerald-300"
+                >
+                  {{ reviewOverview.approvedFields }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-sky-200 bg-sky-50/80 px-4 py-3 dark:border-sky-500/30 dark:bg-sky-500/10"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-sky-700 dark:text-sky-300"
+                >
+                  Pendientes
+                </p>
+                <p
+                  class="mt-2 text-lg font-semibold text-sky-700 dark:text-sky-300"
+                >
+                  {{ reviewOverview.pendingFields }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 dark:border-amber-500/30 dark:bg-amber-500/10"
+              >
+                <p
+                  class="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300"
+                >
+                  Incidencias
+                </p>
+                <p
+                  class="mt-2 text-lg font-semibold text-amber-700 dark:text-amber-300"
+                >
+                  {{
+                    reviewOverview.observedFields +
+                      reviewOverview.rejectedFields
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <section class="app-bg-card-glass max-w-full overflow-hidden rounded-2xl">
+          <div class="max-w-full overflow-x-auto">
+            <table class="min-w-[1100px] w-full text-left 2xl:min-w-[1280px]">
+              <thead
+                class="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
+              >
+                <tr>
+                  <th
+                    class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                  >
+                    Campo
+                  </th>
+                  <th
+                    class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                  >
+                    Tipo
+                  </th>
+                  <th
+                    class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                  >
+                    Valor capturado
+                  </th>
+                  <th
+                    class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                  >
+                    Estatus
+                  </th>
+                  <th
+                    class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                  >
+                    Revision
+                  </th>
+                  <th
+                    class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                  >
+                    Comentario del revisor
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                @for (
+                  field of reviewFields;
+                  track trackByField($index, field)
+                ) {
+                  <tr
+                    class="bg-white align-top transition hover:bg-brand-50/30 dark:bg-transparent dark:hover:bg-brand-500/5"
+                  >
+                    <td class="px-4 py-4">
+                      <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <p
+                            class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                          >
+                            {{ field.label }}
+                          </p>
+                          <span
+                            class="inline-flex rounded-full border border-gray-300 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:border-gray-700 dark:text-gray-300"
+                          >
+                            {{ field.source }}
+                          </span>
+                          @if (field.required) {
+                            <span
+                              class="inline-flex rounded-full border border-rose-300 bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-300"
+                            >
+                              Obligatorio
+                            </span>
+                          }
+                        </div>
+                        <p
+                          class="mt-2 max-w-sm text-xs leading-5 text-gray-500 dark:text-gray-400"
+                        >
+                          {{ field.description }}
+                        </p>
+                      </div>
+                    </td>
+                    <td
+                      class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      {{ field.fieldType }}
+                    </td>
+                    <td class="px-4 py-4">
+                      <div
+                        class="rounded-2xl border border-gray-200 bg-white/80 p-3 dark:border-gray-800 dark:bg-gray-950/50"
+                      >
+                        <p
+                          class="whitespace-pre-line text-sm text-gray-900 dark:text-white/90"
+                        >
+                          {{ field.value }}
+                        </p>
+                      </div>
+                    </td>
+                    <td class="px-4 py-4">
+                      <span
+                        class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold"
+                        [ngClass]="getReviewStatusClass(field.status)"
+                      >
+                        <lucide-icon
+                          [img]="getReviewStatusIcon(field.status)"
+                          class="h-3.5 w-3.5"
+                        ></lucide-icon>
+                        {{ field.status }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-4">
+                      <div class="grid min-w-[280px] grid-cols-2 gap-2">
+                        @for (status of reviewStatuses; track status) {
+                          <button
+                            type="button"
+                            class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition"
+                            [ngClass]="
+                              field.status === status
+                                ? getReviewStatusClass(status)
+                                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+                            "
+                            (click)="updateFieldStatus(field.id, status)"
+                          >
+                            <lucide-icon
+                              [img]="getReviewStatusIcon(status)"
+                              class="h-3.5 w-3.5"
+                            ></lucide-icon>
+                            {{ status }}
+                          </button>
+                        }
+                      </div>
+                    </td>
+                    <td class="px-4 py-4">
+                      <textarea
+                        class="min-h-[110px] w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+                        [ngModel]="field.comment"
+                        (ngModelChange)="updateFieldComment(field.id, $event)"
+                        [placeholder]="getFieldCommentPlaceholder(field)"
+                      ></textarea>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    }
+
+    @if (activeTab === "documentos") {
+      <section class="space-y-4">
+        <article class="app-bg-card-glass rounded-2xl p-4 sm:p-5">
+          <div
+            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+          >
+            <div>
+              <h2
+                class="text-lg font-semibold text-gray-900 dark:text-white/90"
+              >
+                Documentos de la plantilla
+              </h2>
+              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Explorador y tabla usando la misma data documental derivada de
+                la plantilla del proveedor.
+              </p>
+            </div>
+
+            <div
+              class="inline-flex rounded-full border border-gray-300 bg-white p-1 dark:border-gray-700 dark:bg-gray-900"
+            >
+              <button
+                type="button"
+                class="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium transition"
+                [ngClass]="
+                  documentView === 'explorer'
+                    ? 'bg-brand-500 text-white'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
+                "
+                (click)="setDocumentView('explorer')"
+              >
+                <lucide-icon [img]="FolderOpen" class="h-4 w-4"></lucide-icon>
+                Vista explorador
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium transition"
+                [ngClass]="
+                  documentView === 'table'
+                    ? 'bg-brand-500 text-white'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
+                "
+                (click)="setDocumentView('table')"
+              >
+                <lucide-icon
+                  [img]="LayoutTemplate"
+                  class="h-4 w-4"
+                ></lucide-icon>
+                Vista tabla
+              </button>
+            </div>
+          </div>
+        </article>
+
+        @if (documentView === "explorer") {
+          <section
+            class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_340px]"
+          >
+            <article class="app-bg-card-glass min-w-0 overflow-hidden rounded-2xl">
+              <div
+                class="border-b border-gray-200 bg-gray-50/90 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/70"
+              >
+                <div
+                  class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                >
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      class="inline-flex h-10 w-10 items-center justify-center rounded-xl border transition"
+                      [disabled]="!canGoBackInExplorer"
+                      [ngClass]="
+                        canGoBackInExplorer
+                          ? 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-800'
+                          : 'cursor-not-allowed border-gray-200 bg-white/60 text-gray-400 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-600'
+                      "
+                      (click)="goBackInExplorer()"
+                    >
+                      <lucide-icon
+                        [img]="ChevronLeft"
+                        class="h-4 w-4"
+                      ></lucide-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex h-10 w-10 items-center justify-center rounded-xl border transition"
+                      [disabled]="!canGoForwardInExplorer"
+                      [ngClass]="
+                        canGoForwardInExplorer
+                          ? 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-800'
+                          : 'cursor-not-allowed border-gray-200 bg-white/60 text-gray-400 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-600'
+                      "
+                      (click)="goForwardInExplorer()"
+                    >
+                      <lucide-icon
+                        [img]="ChevronRight"
+                        class="h-4 w-4"
+                      ></lucide-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-sm font-medium transition"
+                      [disabled]="!canGoUpInExplorer"
+                      [ngClass]="
+                        canGoUpInExplorer
+                          ? 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-800'
+                          : 'cursor-not-allowed border-gray-200 bg-white/60 text-gray-400 dark:border-gray-800 dark:bg-gray-950/40 dark:text-gray-600'
+                      "
+                      (click)="goUpInExplorer()"
+                    >
+                      <lucide-icon
+                        [img]="ArrowUp"
+                        class="h-4 w-4"
+                      ></lucide-icon>
+                      Subir
+                    </button>
+                  </div>
+
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 text-sm">
+                      @for (
+                        crumb of explorerBreadcrumbs;
+                        track crumb.label + "_" + $index
+                      ) {
+                        <button
+                          type="button"
+                          class="inline-flex max-w-full items-center rounded-full border px-3 py-1.5 transition"
+                          [ngClass]="
+                            crumb.folderId === currentExplorerFolderId ||
+                            (!crumb.folderId && isExplorerAtRoot && $last)
+                              ? 'border-brand-300 bg-brand-50 font-medium text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-200'
+                              : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-800'
+                          "
+                          (click)="navigateToExplorerBreadcrumb(crumb.folderId)"
+                        >
+                          <span class="truncate">{{ crumb.label }}</span>
+                        </button>
+                        @if (!$last) {
+                          <span class="text-gray-400 dark:text-gray-500"
+                            >/</span
+                          >
+                        }
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="border-b border-gray-200 bg-white/70 px-4 py-3 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <div
+                  class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between"
+                >
+                  <div>
+                    <p
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{
+                        isExplorerAtRoot
+                          ? "Raiz documental"
+                          : currentExplorerFolder?.name
+                      }}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      @if (isExplorerAtRoot) {
+                        {{ explorerFolders.length }} carpetas disponibles para
+                        revision
+                      } @else {
+                        {{ currentFolderDocuments.length }} archivos visibles en
+                        esta carpeta
+                      }
+                    </p>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    @if (isExplorerAtRoot) {
+                      Click simple para seleccionar carpeta. Doble click para
+                      entrar.
+                    } @else {
+                      Click simple para seleccionar archivo. Doble click para
+                      abrir revision.
+                    }
+                  </p>
+                </div>
+              </div>
+
+              <div class="p-4 sm:p-5">
+                @if (isExplorerAtRoot) {
+                  <div
+                    class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5"
+                  >
+                    @for (
+                      folder of explorerFolders;
+                      track trackByFolder($index, folder)
+                    ) {
+                      <button
+                        type="button"
+                        class="group flex min-h-[136px] flex-col rounded-3xl border px-3 py-3 text-left transition"
+                        [ngClass]="
+                          selectedFolderId === folder.id
+                            ? 'border-brand-500 bg-brand-50 shadow-sm dark:border-brand-400 dark:bg-brand-500/10'
+                            : 'border-gray-200 bg-white/80 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950/50 dark:hover:bg-gray-900'
+                        "
+                        (click)="selectFolder(folder.id)"
+                        (dblclick)="openFolder(folder.id)"
+                      >
+                        <div
+                          class="flex items-center justify-between gap-2 border-b border-gray-200/80 pb-2 dark:border-gray-800/80"
+                        >
+                          <span
+                            class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500"
+                          >
+                            Carpeta
+                          </span>
+                          <span
+                            class="rounded-full border border-gray-300 px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:border-gray-700 dark:text-gray-300"
+                          >
+                            {{ folder.totalDocuments }} elementos
+                          </span>
+                        </div>
+                        <div
+                          class="flex flex-1 flex-col items-center justify-center gap-3 py-3 text-center"
+                        >
+                          <img
+                            [src]="folderIconPath"
+                            alt="Carpeta"
+                            class="h-12 w-12 object-contain transition group-hover:scale-[1.03]"
+                          />
+                          <p
+                            class="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                          >
+                            {{ folder.name }}
+                          </p>
+                        </div>
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  @if (currentFolderDocuments.length) {
+                    <div
+                      class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5"
+                    >
+                      @for (
+                        document of currentFolderDocuments;
+                        track trackByDocument($index, document)
+                      ) {
+                        <button
+                          type="button"
+                          class="group flex min-h-[150px] flex-col rounded-3xl border px-3 py-3 text-left transition"
+                          [ngClass]="
+                            selectedDocument?.id === document.id
+                              ? 'border-brand-500 bg-brand-50 shadow-sm dark:border-brand-400 dark:bg-brand-500/10'
+                              : 'border-gray-200 bg-white/80 hover:border-gray-300 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950/50 dark:hover:bg-gray-900'
+                          "
+                          (click)="selectDocument(document.id)"
+                          (dblclick)="openDocumentPreview(document)"
+                        >
+                          <div
+                            class="flex items-start justify-between gap-2 border-b border-gray-200/80 pb-2 dark:border-gray-800/80"
+                          >
+                            <div class="min-w-0">
+                              <p
+                                class="truncate text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                              >
+                                {{ document.extension }} /
+                                {{ document.sizeLabel }}
+                              </p>
+                            </div>
+                            <span
+                              class="inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold"
+                              [ngClass]="
+                                getReviewStatusClass(document.reviewStatus)
+                              "
+                            >
+                              <lucide-icon
+                                [img]="
+                                  getReviewStatusIcon(document.reviewStatus)
+                                "
+                                class="h-3 w-3"
+                              ></lucide-icon>
+                              {{ document.reviewStatus }}
+                            </span>
+                          </div>
+                          <div
+                            class="flex flex-1 flex-col items-center justify-center gap-3 py-3 text-center"
+                          >
+                            <img
+                              [src]="getDocumentIcon(document)"
+                              [alt]="document.extension"
+                              class="h-12 w-12 object-contain transition group-hover:scale-[1.03]"
+                            />
+                            <p
+                              class="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-white/90"
+                            >
+                              {{ document.name }}
+                            </p>
+                          </div>
+                        </button>
+                      }
+                    </div>
+                  } @else {
+                    <div
+                      class="flex min-h-[280px] items-center justify-center rounded-3xl border border-dashed border-gray-300 bg-gray-50/70 p-6 text-center dark:border-gray-700 dark:bg-gray-900/40"
+                    >
+                      <div class="max-w-sm">
+                        <img
+                          [src]="folderIconPath"
+                          alt="Carpeta"
+                          class="mx-auto h-16 w-16 object-contain opacity-70"
+                        />
+                        <p
+                          class="mt-4 text-sm font-semibold text-gray-900 dark:text-white/90"
+                        >
+                          Esta carpeta no tiene archivos visibles
+                        </p>
+                        <p
+                          class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                        >
+                          Regresa a la raiz del explorador o selecciona otra
+                          carpeta desde la ruta superior.
+                        </p>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </article>
+
+            <aside class="app-bg-card-glass min-w-0 rounded-2xl p-4 sm:p-5">
+              @if (selectedDocument) {
+                <div class="space-y-4">
+                  <div class="flex items-start gap-3">
+                    <img
+                      [src]="getDocumentIcon(selectedDocument)"
+                      [alt]="selectedDocument.extension"
+                      class="h-14 w-14 shrink-0 object-contain"
+                    />
+                    <div class="min-w-0">
+                      <p
+                        class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        Archivo seleccionado
+                      </p>
+                      <h3
+                        class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90"
+                      >
+                        {{ selectedDocument.name }}
+                      </h3>
+                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {{ selectedDocument.category }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+                  >
+                    <div class="grid grid-cols-1 gap-3 text-sm">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Tipo de archivo
+                        </p>
+                        <p
+                          class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                        >
+                          {{ selectedDocument.extension }} /
+                          {{ selectedDocument.type }}
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Fecha de carga
+                        </p>
+                        <p
+                          class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                        >
+                          {{ formatDateTime(selectedDocument.uploadedAt) }}
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Estatus
+                        </p>
+                        <span
+                          class="mt-2 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold"
+                          [ngClass]="
+                            getReviewStatusClass(selectedDocument.reviewStatus)
+                          "
+                        >
+                          <lucide-icon
+                            [img]="
+                              getReviewStatusIcon(selectedDocument.reviewStatus)
+                            "
+                            class="h-3.5 w-3.5"
+                          ></lucide-icon>
+                          {{ selectedDocument.reviewStatus }}
+                        </span>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Comentario del revisor
+                        </p>
+                        <p
+                          class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300"
+                        >
+                          {{
+                            selectedDocument.reviewComment ||
+                              "Sin comentario por ahora."
+                          }}
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Ruta
+                        </p>
+                        <p
+                          class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300"
+                        >
+                          {{ getDocumentRoute(selectedDocument) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    @for (status of reviewStatuses; track status) {
+                      <button
+                        type="button"
+                        class="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition"
+                        [disabled]="
+                          status === 'Aprobado' &&
+                          !selectedDocument.fileAvailable
+                        "
+                        [ngClass]="
+                          selectedDocument.reviewStatus === status
+                            ? getReviewStatusClass(status)
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+                        "
+                        (click)="
+                          updateDocumentStatus(selectedDocument.id, status)
+                        "
+                      >
+                        <lucide-icon
+                          [img]="getReviewStatusIcon(status)"
+                          class="h-3.5 w-3.5"
+                        ></lucide-icon>
+                        {{ status }}
+                      </button>
+                    }
+                  </div>
+
+                  <textarea
+                    class="min-h-[130px] w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+                    [ngModel]="selectedDocument.reviewComment"
+                    (ngModelChange)="
+                      updateDocumentComment(selectedDocument.id, $event)
+                    "
+                    [placeholder]="
+                      getDocumentCommentPlaceholder(selectedDocument)
+                    "
+                  ></textarea>
+
+                  <button
+                    type="button"
+                    class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+                    (click)="openDocumentPreview(selectedDocument)"
+                  >
+                    <lucide-icon [img]="Eye" class="h-4 w-4"></lucide-icon>
+                    Abrir revision del documento
+                  </button>
+                </div>
+              } @else if (detailFolder) {
+                <div class="space-y-4">
+                  <div class="flex items-start gap-3">
+                    <img
+                      [src]="folderIconPath"
+                      alt="Carpeta"
+                      class="h-14 w-14 shrink-0 object-contain"
+                    />
+                    <div class="min-w-0">
+                      <p
+                        class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        Carpeta seleccionada
+                      </p>
+                      <h3
+                        class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90"
+                      >
+                        {{ detailFolder.name }}
+                      </h3>
+                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {{ detailFolder.description }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+                  >
+                    <div class="grid grid-cols-1 gap-3 text-sm">
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Tipo
+                        </p>
+                        <p
+                          class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                        >
+                          Carpeta
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Elementos
+                        </p>
+                        <p
+                          class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                        >
+                          {{ detailFolder.totalDocuments }} archivos
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Ruta
+                        </p>
+                        <p
+                          class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300"
+                        >
+                          {{ getFolderRoute(detailFolder) }}
+                        </p>
+                      </div>
+                      <div>
+                        <p
+                          class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                        >
+                          Resumen
+                        </p>
+                        <p
+                          class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-300"
+                        >
+                          {{ detailFolder.approvedDocuments }} aprobados,
+                          {{ detailFolder.pendingDocuments }} pendientes y
+                          {{
+                            detailFolder.observedDocuments +
+                              detailFolder.rejectedDocuments
+                          }}
+                          incidencias.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div
+                      class="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-3 py-3 dark:border-emerald-500/30 dark:bg-emerald-500/10"
+                    >
+                      <p
+                        class="font-semibold text-emerald-700 dark:text-emerald-300"
+                      >
+                        {{ detailFolder.approvedDocuments }}
+                      </p>
+                      <p
+                        class="mt-1 text-emerald-700/80 dark:text-emerald-300/80"
+                      >
+                        Aprobados
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-sky-200 bg-sky-50/80 px-3 py-3 dark:border-sky-500/30 dark:bg-sky-500/10"
+                    >
+                      <p class="font-semibold text-sky-700 dark:text-sky-300">
+                        {{ detailFolder.pendingDocuments }}
+                      </p>
+                      <p class="mt-1 text-sky-700/80 dark:text-sky-300/80">
+                        Pendientes
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-amber-200 bg-amber-50/80 px-3 py-3 dark:border-amber-500/30 dark:bg-amber-500/10"
+                    >
+                      <p
+                        class="font-semibold text-amber-700 dark:text-amber-300"
+                      >
+                        {{
+                          detailFolder.observedDocuments +
+                            detailFolder.rejectedDocuments
+                        }}
+                      </p>
+                      <p class="mt-1 text-amber-700/80 dark:text-amber-300/80">
+                        Incidencias
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300"
+                  >
+                    Las carpetas solo concentran el contexto documental.
+                    Selecciona un archivo dentro de la carpeta para revisar,
+                    aprobar, observar o rechazar.
+                  </div>
+                </div>
+              }
+            </aside>
+          </section>
+        } @else {
+          <section class="app-bg-card-glass max-w-full overflow-hidden rounded-2xl">
+            <div class="max-w-full overflow-x-auto">
+              <table class="min-w-[1080px] w-full text-left 2xl:min-w-[1240px]">
+                <thead
+                  class="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
+                >
+                  <tr>
+                    <th
+                      class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Nombre
+                    </th>
+                    <th
+                      class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Categoria
+                    </th>
+                    <th
+                      class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Tipo de archivo
+                    </th>
+                    <th
+                      class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Estatus
+                    </th>
+                    <th
+                      class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Fecha de carga
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Comentario
+                    </th>
+                    <th
+                      class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-300"
+                    >
+                      Accion
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  class="divide-y divide-gray-100 dark:divide-white/[0.05]"
+                >
+                  @for (
+                    document of reviewDocuments;
+                    track trackByDocument($index, document)
+                  ) {
+                    <tr
+                      class="bg-white transition hover:bg-brand-50/40 dark:bg-transparent dark:hover:bg-brand-500/5"
+                    >
+                      <td class="px-4 py-4">
+                        <div class="flex items-center gap-3">
+                          <img
+                            [src]="getDocumentIcon(document)"
+                            [alt]="document.extension"
+                            class="h-11 w-11 shrink-0 object-contain"
+                          />
+                          <div class="min-w-0">
+                            <p
+                              class="truncate text-sm font-semibold text-gray-900 dark:text-white/90"
+                            >
+                              {{ document.name }}
+                            </p>
+                            <p
+                              class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+                            >
+                              {{ document.extension }} /
+                              {{ document.sizeLabel }}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td
+                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        {{ document.category }}
+                      </td>
+                      <td
+                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        {{ document.type }}
+                      </td>
+                      <td class="px-4 py-4">
+                        <div class="flex flex-col gap-2">
+                          <span
+                            class="inline-flex w-fit items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold"
+                            [ngClass]="
+                              getReviewStatusClass(document.reviewStatus)
+                            "
+                          >
+                            <lucide-icon
+                              [img]="getReviewStatusIcon(document.reviewStatus)"
+                              class="h-3.5 w-3.5"
+                            ></lucide-icon>
+                            {{ document.reviewStatus }}
+                          </span>
+                          @if (!document.fileAvailable) {
+                            <span
+                              class="inline-flex w-fit rounded-full border border-rose-300 bg-rose-50 px-2 py-1 text-[11px] font-semibold text-rose-700 dark:border-rose-500/40 dark:bg-rose-500/10 dark:text-rose-300"
+                            >
+                              Sin archivo
+                            </span>
+                          }
+                        </div>
+                      </td>
+                      <td
+                        class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        {{ formatDateTime(document.uploadedAt) }}
+                      </td>
+                      <td class="px-4 py-4 text-center">
+                        <button
+                          type="button"
+                          class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                          (click)="openCommentModal(document)"
+                          [attr.aria-label]="
+                            'Ver comentario de ' + document.name
+                          "
+                        >
+                          <lucide-icon
+                            [img]="FileText"
+                            class="h-4 w-4"
+                          ></lucide-icon>
+                        </button>
+                      </td>
+                      <td class="px-4 py-4 text-center">
+                        <button
+                          type="button"
+                          class="inline-flex h-9 items-center gap-2 rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-800"
+                          (click)="openDocumentPreview(document)"
+                        >
+                          <lucide-icon
+                            [img]="Eye"
+                            class="h-4 w-4"
+                          ></lucide-icon>
+                          Revisar
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+      </section>
+    }
+
+    @if (activeTab === "historial") {
+      <section class="app-bg-card-glass rounded-2xl p-5">
+        <div class="flex items-center gap-3">
+          <span
+            class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-gray-200 bg-white/70 text-gray-700 dark:border-gray-800 dark:bg-gray-950/50 dark:text-gray-200"
+          >
+            <lucide-icon [img]="History" class="h-5 w-5"></lucide-icon>
+          </span>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+              Historial de revision
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Trazabilidad breve del expediente y sus movimientos recientes.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-4">
+          @for (
+            item of recordDetail.history;
+            track trackByTimeline($index, item)
+          ) {
+            <article class="flex gap-4">
+              <div class="flex flex-col items-center">
+                <span
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-2xl"
+                  [ngClass]="getTimelineTone(item)"
+                >
+                  <lucide-icon [img]="History" class="h-4 w-4"></lucide-icon>
+                </span>
+                <span
+                  class="mt-2 h-full w-px bg-gray-200 dark:bg-gray-800"
+                ></span>
+              </div>
+
+              <div
+                class="mb-4 flex-1 rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <div
+                  class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <h3
+                    class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ item.title }}
+                  </h3>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ formatDateTime(item.timestamp) }}
+                  </span>
+                </div>
+                <p
+                  class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300"
+                >
+                  {{ item.description }}
+                </p>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (previewDocument) {
+      <div
+        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-950/70 p-4 backdrop-blur-sm sm:items-center"
+      >
+        <div
+          class="flex max-h-[calc(100vh-2rem)] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-950"
+        >
+          <div
+            class="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800"
+          >
+            <div class="min-w-0">
+              <p
+                class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              >
+                Revision documental
+              </p>
+              <h3
+                class="truncate text-lg font-semibold text-gray-900 dark:text-white/90"
+              >
+                {{ previewDocument.name }}
+              </h3>
+            </div>
+            <button
+              type="button"
+              class="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+              (click)="closeDocumentPreview()"
+            >
+              Cerrar
+            </button>
+          </div>
+
+          <div
+            class="grid max-h-[calc(100vh-7rem)] flex-1 overflow-y-auto lg:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_360px]"
+          >
+            <div
+              class="border-b border-gray-200 p-6 dark:border-gray-800 lg:border-b-0 lg:border-r"
+            >
+              <div
+                class="flex h-full min-h-[420px] items-center justify-center rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-6 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950"
+              >
+                @if (previewDocument.fileKind === "image") {
+                  <div class="w-full max-w-2xl space-y-6 text-center">
+                    <img
+                      [src]="imageIconPath"
+                      alt="Imagen"
+                      class="mx-auto h-28 w-28 object-contain"
+                    />
+                    <div
+                      class="rounded-3xl border border-dashed border-gray-300 bg-white/90 p-8 dark:border-gray-700 dark:bg-gray-950/70"
+                    >
+                      <p
+                        class="text-lg font-semibold text-gray-900 dark:text-white/90"
+                      >
+                        Vista simulada de imagen
+                      </p>
+                      <p
+                        class="mt-3 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                      >
+                        El archivo se abre en modo revision para validar
+                        legibilidad, vigencia y coincidencia con la plantilla.
+                      </p>
+                    </div>
+                  </div>
+                } @else {
+                  <div class="w-full max-w-2xl space-y-6 text-center">
+                    <img
+                      [src]="pdfIconPath"
+                      alt="PDF"
+                      class="mx-auto h-28 w-28 object-contain"
+                    />
+                    <div class="space-y-3">
+                      <div
+                        class="rounded-2xl border border-gray-300 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                      >
+                        <div
+                          class="h-3 w-24 rounded-full bg-gray-200 dark:bg-gray-700"
+                        ></div>
+                        <div
+                          class="mt-3 h-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                        ></div>
+                        <div
+                          class="mt-2 h-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                        ></div>
+                        <div
+                          class="mt-2 h-2 w-4/5 rounded-full bg-gray-100 dark:bg-gray-800"
+                        ></div>
+                      </div>
+                      <div
+                        class="rounded-2xl border border-gray-300 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                      >
+                        <div
+                          class="h-3 w-20 rounded-full bg-gray-200 dark:bg-gray-700"
+                        ></div>
+                        <div
+                          class="mt-3 h-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                        ></div>
+                        <div
+                          class="mt-2 h-2 rounded-full bg-gray-100 dark:bg-gray-800"
+                        ></div>
+                        <div
+                          class="mt-2 h-2 w-3/4 rounded-full bg-gray-100 dark:bg-gray-800"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <aside class="space-y-4 p-6">
+              <div
+                class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-800 dark:bg-gray-950/50"
+              >
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Tipo
+                    </p>
+                    <p
+                      class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ previewDocument.extension }} /
+                      {{ previewDocument.type }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Fecha
+                    </p>
+                    <p
+                      class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ formatDateTime(previewDocument.uploadedAt) }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Categoria
+                    </p>
+                    <p
+                      class="mt-1 font-medium text-gray-900 dark:text-white/90"
+                    >
+                      {{ previewDocument.category }}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Estatus actual
+                    </p>
+                    <span
+                      class="mt-2 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold"
+                      [ngClass]="
+                        getReviewStatusClass(previewDocument.reviewStatus)
+                      "
+                    >
+                      <lucide-icon
+                        [img]="
+                          getReviewStatusIcon(previewDocument.reviewStatus)
+                        "
+                        class="h-3.5 w-3.5"
+                      ></lucide-icon>
+                      {{ previewDocument.reviewStatus }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                @for (status of reviewStatuses; track status) {
+                  <button
+                    type="button"
+                    class="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition"
+                    [disabled]="
+                      status === 'Aprobado' && !previewDocument.fileAvailable
+                    "
+                    [ngClass]="
+                      previewDocument.reviewStatus === status
+                        ? getReviewStatusClass(status)
+                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800'
+                    "
+                    (click)="updateDocumentStatus(previewDocument.id, status)"
+                  >
+                    <lucide-icon
+                      [img]="getReviewStatusIcon(status)"
+                      class="h-3.5 w-3.5"
+                    ></lucide-icon>
+                    {{ status }}
+                  </button>
+                }
+              </div>
+
+              <textarea
+                class="min-h-[160px] w-full rounded-2xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-200"
+                [ngModel]="previewDocument.reviewComment"
+                (ngModelChange)="
+                  updateDocumentComment(previewDocument.id, $event)
+                "
+                [placeholder]="getDocumentCommentPlaceholder(previewDocument)"
+              ></textarea>
+            </aside>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (commentModalDocument) {
+      <div
+        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-gray-950/70 p-4 backdrop-blur-sm sm:items-center"
+      >
+        <div
+          class="flex max-h-[calc(100vh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl dark:border-gray-800 dark:bg-gray-950"
+        >
+          <div
+            class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4 dark:border-gray-800"
+          >
+            <div class="min-w-0">
+              <p
+                class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              >
+                Comentario de revision
+              </p>
+              <h3
+                class="mt-2 truncate text-lg font-semibold text-gray-900 dark:text-white/90"
+              >
+                {{ commentModalDocument.name }}
+              </h3>
+            </div>
+            <button
+              type="button"
+              class="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+              (click)="closeCommentModal()"
+            >
+              Cerrar
+            </button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-6">
+            <div
+              class="rounded-2xl border border-gray-200 bg-gray-50/80 p-5 dark:border-gray-800 dark:bg-gray-900/40"
+            >
+              <p class="text-sm leading-7 text-gray-700 dark:text-gray-300">
+                {{
+                  commentModalDocument.reviewComment ||
+                    "Sin comentario registrado"
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="min-h-[calc(100vh-6rem)] pb-4">
+    <section
+      class="app-bg-card-glass flex min-h-[360px] flex-col items-center justify-center rounded-2xl px-6 py-10 text-center"
+    >
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white/90">
+        Expediente no disponible
+      </h1>
+      <p class="mt-2 max-w-md text-sm text-gray-500 dark:text-gray-400">
+        No fue posible encontrar el expediente local solicitado.
+      </p>
+      <a
+        [routerLink]="['/expediente/proveedores']"
+        class="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+      >
+        <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+        Regresar al listado
+      </a>
+    </section>
+  </div>
+}

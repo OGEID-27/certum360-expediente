@@ -1,0 +1,57 @@
+<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+  <p class="mb-2 text-sm font-medium text-gray-800 dark:text-white/90">
+    {{ question.titulo }}
+    @if (question.obligatoria) {
+      <span class="text-error-500">*</span>
+    }
+  </p>
+
+  @if (question.ayuda) {
+    <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+      {{ question.ayuda }}
+    </p>
+  }
+
+  <input
+    type="file"
+    (change)="onFileSelected($event)"
+    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-brand-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+  />
+
+  @if (allowedExtensions.length > 0 || maxSizeMB) {
+    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+      @if (allowedExtensions.length > 0) {
+        Extensiones: {{ allowedExtensions.join(", ") }}.
+      }
+      @if (maxSizeMB) {
+        Tamaño máximo: {{ maxSizeMB }} MB.
+      }
+    </p>
+  }
+
+  @if (control.value) {
+    <div
+      class="mt-3 flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm dark:bg-white/[0.05]"
+    >
+      <span class="text-gray-700 dark:text-gray-300"
+        >{{ control.value.fileName }} ({{ control.value.fileSize }} bytes)</span
+      >
+      <button
+        type="button"
+        class="text-xs text-error-500"
+        (click)="clearFile()"
+      >
+        Quitar
+      </button>
+    </div>
+  }
+
+  @if (showRequiredError) {
+    <p class="mt-2 text-xs text-error-500">Debes adjuntar un archivo.</p>
+  }
+  @if (showInvalidFileError || fileError) {
+    <p class="mt-2 text-xs text-error-500">
+      {{ fileError || "Archivo inválido." }}
+    </p>
+  }
+</div>

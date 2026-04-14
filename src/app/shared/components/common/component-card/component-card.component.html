@@ -1,0 +1,37 @@
+<div class="app-bg-card-glass rounded-2xl {{ className }}">
+  <!-- Card Header -->
+  <div class="px-6 py-5">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h3 class="text-lg font-medium text-gray-800 dark:text-white/90">
+          <span class="inline-flex items-center gap-2">
+            @if (titleIcon) {
+              <lucide-icon
+                [img]="$any(titleIcon)"
+                [class]="titleIconClass"
+              ></lucide-icon>
+            }
+            <span>{{ title }}</span>
+          </span>
+        </h3>
+        @if (desc) {
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {{ desc }}
+          </p>
+        }
+      </div>
+      <div class="shrink-0">
+        <ng-content select="[cardHeaderActions]"></ng-content>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Body -->
+  <div
+    class="min-h-0 flex-1 border-t border-gray-100 p-4 dark:border-gray-800 sm:p-6"
+  >
+    <div class="space-y-6">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

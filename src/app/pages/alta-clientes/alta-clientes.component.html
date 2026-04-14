@@ -1,0 +1,292 @@
+﻿<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <div class="app-bg-card-glass space-y-4 rounded-xl p-3 sm:p-4 lg:p-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <lucide-icon
+          [img]="BookUser"
+          class="h-6 w-6 text-brand-600 dark:text-brand-300"
+        ></lucide-icon>
+        <h1
+          class="text-xl font-semibold text-gray-900 dark:text-white/90 sm:text-2xl"
+        >
+          Alta de Clientes
+        </h1>
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex h-10 items-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white shadow-sm transition hover:bg-brand-600 focus:outline-hidden focus:ring-2 focus:ring-brand-500/30"
+        (click)="showCreateForm()"
+      >
+        <lucide-icon [img]="Plus" class="h-4 w-4"></lucide-icon>
+        Nuevo Cliente
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 gap-3 lg:grid-cols-10">
+      <div class="lg:col-span-7">
+        <div class="relative">
+          <span
+            class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+          >
+            <lucide-icon [img]="Search" class="h-4 w-4"></lucide-icon>
+          </span>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Buscar por cliente, RFC, contacto o correo..."
+            class="h-11 w-full rounded-xl border border-gray-300 bg-white py-2.5 pr-4 pl-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-gray-500"
+          />
+        </div>
+      </div>
+
+      <div class="lg:col-span-3">
+        <div
+          class="flex h-full min-h-11 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+        >
+          <lucide-icon
+            [img]="Users"
+            class="mr-2 h-4 w-4 shrink-0 text-brand-500"
+          ></lucide-icon>
+          Total: {{ totalClients }} clientes
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-bg-card-glass overflow-hidden rounded-xl">
+    <div
+      class="h-[560px] overflow-auto scrollbar-thin-dark [scrollbar-gutter:stable]"
+    >
+      <table class="w-full min-w-[1180px] text-left">
+        <thead
+          class="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
+        >
+          <tr>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Img
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Cliente
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Tipo
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Sector
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              RFC
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Contacto principal
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Correo principal
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Estatus
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Usuarios
+            </th>
+            <th
+              class="px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300"
+            >
+              Acciones
+            </th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+          @for (client of paginatedClients; track client.id; let i = $index) {
+            <tr
+              class="transition hover:bg-brand-50/40 dark:hover:bg-brand-500/5"
+              [ngClass]="
+                i % 2 === 0
+                  ? 'bg-white dark:bg-transparent'
+                  : 'bg-gray-50/50 dark:bg-gray-900/20'
+              "
+            >
+              <td class="px-4 py-4">
+                @if (getClientImageUrl(client); as imageUrl) {
+                  <img
+                    [src]="imageUrl"
+                    [alt]="client.nombreCliente"
+                    class="h-10 w-10 rounded-full object-cover object-center ring-1 ring-white/40"
+                    loading="lazy"
+                  />
+                } @else {
+                  <span
+                    class="inline-grid h-10 w-10 place-items-center rounded-full border border-white/30 bg-brand-500/20 text-sm font-semibold text-brand-700 shadow-sm backdrop-blur-md dark:text-brand-200"
+                  >
+                    {{ getClientInitials(client.nombreCliente) }}
+                  </span>
+                }
+              </td>
+              <td
+                class="px-4 py-4 text-sm font-medium text-gray-800 dark:text-white/90"
+              >
+                {{ client.nombreCliente }}
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                {{ getTipoLabel(client.tipoCliente) }}
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                {{ client.sector }}
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                {{ client.rfc || "Sin RFC" }}
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                {{ client.contactoNombre }}
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                {{ client.correoPrincipal }}
+              </td>
+              <td class="px-4 py-4 text-sm">
+                <div class="flex flex-col gap-1">
+                  <span
+                    class="inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-medium"
+                    [ngClass]="getStatusClass(client.estatus)"
+                  >
+                    {{ client.estatus }}
+                  </span>
+                  @if (isFiscalIncomplete(client)) {
+                    <span
+                      class="inline-flex w-fit rounded-full border border-warning-300 bg-warning-50 px-2 py-0.5 text-[11px] font-medium text-warning-700 dark:border-warning-500/40 dark:bg-warning-500/10 dark:text-warning-300"
+                    >
+                      Fiscal incompleto
+                    </span>
+                  }
+                </div>
+              </td>
+              <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+                {{ getUsersCount(client.id) }}
+              </td>
+              <td class="px-4 py-4 text-sm">
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-brand-600 transition hover:border-brand-300 hover:bg-brand-50 dark:border-gray-700 dark:text-brand-300 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+                    title="Editar"
+                    (click)="editClient(client)"
+                  >
+                    <lucide-icon [img]="Pencil" class="h-4 w-4"></lucide-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-emerald-600 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-gray-700 dark:text-emerald-300 dark:hover:border-emerald-500/40 dark:hover:bg-emerald-500/10"
+                    title="Evaluaciones"
+                    (click)="openClientEvaluations(client)"
+                  >
+                    <lucide-icon
+                      [img]="ShieldCheck"
+                      class="h-4 w-4"
+                    ></lucide-icon>
+                  </button>
+
+                  <button
+                    type="button"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-700 transition hover:border-brand-300 hover:bg-brand-50 dark:border-gray-700 dark:text-gray-300 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+                    title="Usuarios"
+                    (click)="openUsersDrawer(client)"
+                  >
+                    <lucide-icon [img]="Users" class="h-4 w-4"></lucide-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+
+          @if (paginatedClients.length === 0) {
+            <tr>
+              <td
+                colspan="10"
+                class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
+              >
+                No hay clientes para mostrar.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      class="flex flex-col gap-3 border-t border-gray-200 px-4 py-3 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p class="text-xs text-gray-500 dark:text-gray-400">
+        Mostrando {{ pageStartItem }}-{{ pageEndItem }} de
+        {{ totalClients }} registros
+      </p>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="text-xs text-gray-500 dark:text-gray-400">Tamano</label>
+        <select
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+          class="h-9 rounded-lg border border-gray-300 bg-white px-2 text-xs text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+        >
+          @for (size of pageSizeOptions; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+
+        <button
+          type="button"
+          class="h-9 rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-45 dark:border-gray-700 dark:text-gray-300"
+          [disabled]="currentPage <= 1"
+          (click)="goToPreviousPage()"
+        >
+          Ant.
+        </button>
+
+        <span
+          class="min-w-16 text-center text-xs font-medium text-gray-600 dark:text-gray-300"
+        >
+          Pag {{ currentPage }} / {{ totalPages }}
+        </span>
+
+        <button
+          type="button"
+          class="h-9 rounded-lg border border-gray-300 px-3 text-xs font-medium text-gray-700 disabled:cursor-not-allowed disabled:opacity-45 dark:border-gray-700 dark:text-gray-300"
+          [disabled]="currentPage >= totalPages"
+          (click)="goToNextPage()"
+        >
+          Sig.
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (isUsersDrawerOpen) {
+    <app-client-users-drawer
+      [isOpen]="isUsersDrawerOpen"
+      [clientId]="selectedClientId"
+      [clientName]="selectedClientName"
+      (closed)="closeUsersDrawer()"
+      (usersChanged)="onUsersChanged()"
+    ></app-client-users-drawer>
+  }
+</div>

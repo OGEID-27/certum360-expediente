@@ -1,0 +1,576 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  @if (false) {
+    <section
+    class="relative mb-6 overflow-hidden rounded-[30px] border border-white/30 px-6 py-0 text-white shadow-[0_28px_80px_-36px_rgba(8,47,73,0.65)] backdrop-blur-xl dark:border-white/10"
+    style="
+      background: linear-gradient(
+        135deg,
+        rgba(94, 70, 244, 0.96) 0%,
+        rgba(69, 86, 247, 0.95) 28%,
+        rgba(68, 60, 224, 0.94) 62%,
+        rgba(42, 40, 117, 0.96) 100%
+      );
+    "
+  >
+    <div
+      class="pointer-events-none absolute inset-0 rounded-[30px] opacity-90"
+      style="
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(255, 255, 255, 0.2),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(167, 139, 250, 0.16),
+            transparent 30%
+          );
+      "
+    ></div>
+    <div
+      class="pointer-events-none absolute -top-16 right-0 h-40 w-40 rounded-full bg-fuchsia-200/18 blur-3xl"
+    ></div>
+    <div
+      class="pointer-events-none absolute -bottom-20 left-10 h-44 w-44 rounded-full bg-indigo-400/20 blur-3xl"
+    ></div>
+
+    <div
+      class="relative grid items-center gap-8 py-8 xl:grid-cols-[1fr_460px] 2xl:grid-cols-[1fr_560px]"
+    >
+      <div class="max-w-2xl space-y-5">
+        <span
+          class="inline-flex items-center rounded-full border border-white/20 bg-white/12 px-3 py-1 text-[11px] font-semibold tracking-[0.28em] text-white/90 backdrop-blur-md"
+        >
+          {{ dashboardData.heroBadge }}
+        </span>
+
+        <div class="space-y-2.5">
+          <h1
+            class="text-3xl font-semibold tracking-tight text-white sm:text-4xl xl:text-[2.65rem]"
+          >
+            Bienvenid@, {{ dashboardData.adminName }} 👋
+          </h1>
+          <p class="text-sm font-medium text-white/80 sm:text-base">
+            {{ dashboardData.heroSubtitle }}
+          </p>
+          <p class="max-w-xl text-sm leading-6 text-white/78 sm:text-[15px]">
+            {{ dashboardData.heroDescription }}
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            class="inline-flex h-11 items-center gap-2 rounded-2xl border border-white/20 bg-white/14 px-4 text-sm font-medium text-white shadow-[0_10px_30px_-18px_rgba(15,23,42,0.7)] backdrop-blur-md transition hover:bg-white/18"
+            (click)="refreshDashboard()"
+          >
+            <lucide-icon
+              [img]="RefreshCcw"
+              class="h-4 w-4"
+              [class.animate-spin]="isLoading"
+            ></lucide-icon>
+            Actualizar
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex h-11 items-center gap-2 rounded-2xl border border-white/15 bg-slate-950/20 px-4 text-sm font-medium text-white transition hover:bg-slate-950/30"
+            (click)="jumpToSection('expediente-revision')"
+          >
+            Revisiones criticas
+            <lucide-icon [img]="ArrowRight" class="h-4 w-4"></lucide-icon>
+          </button>
+        </div>
+
+        <div class="grid gap-3 pt-1 sm:grid-cols-3">
+          <div
+            class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
+          >
+            <p class="text-xs uppercase tracking-[0.18em] text-white/70">
+              Aprobados
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-white">
+              {{ dashboardData.metrics[2]?.value ?? 0 }}
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
+          >
+            <p class="text-xs uppercase tracking-[0.18em] text-white/70">
+              Pendientes
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-white">
+              {{ dashboardData.metrics[3]?.value ?? 0 }}
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
+          >
+            <p class="text-xs uppercase tracking-[0.18em] text-white/70">
+              Vencidos
+            </p>
+            <p class="mt-2 text-2xl font-semibold text-white">
+              {{ dashboardData.metrics[5]?.value ?? 0 }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="pointer-events-none relative flex items-center justify-center"
+      >
+        <div
+          class="absolute inset-x-10 bottom-6 h-16 rounded-full bg-slate-950/25 blur-2xl"
+        ></div>
+        <img
+          [src]="heroImageSrc"
+          alt="Dashboard expediente"
+          class="relative z-10 w-full max-w-[340px] object-contain sm:max-w-[380px] xl:w-[420px] xl:max-w-none 2xl:w-[520px]"
+        />
+      </div>
+    </div>
+    </section>
+  }
+
+  <section
+    class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6"
+  >
+    @if (isLoading) {
+      @for (_ of metricSkeleton; track $index) {
+        <article
+          class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+        >
+          <div class="animate-pulse space-y-4">
+            <div class="flex items-center justify-between">
+              <div
+                class="h-12 w-12 rounded-full bg-gray-200 dark:bg-white/10"
+              ></div>
+              <div
+                class="h-4 w-20 rounded-full bg-gray-200 dark:bg-white/10"
+              ></div>
+            </div>
+            <div class="h-8 w-24 rounded-lg bg-gray-200 dark:bg-white/10"></div>
+            <div class="h-4 w-32 rounded-lg bg-gray-200 dark:bg-white/10"></div>
+          </div>
+        </article>
+      }
+    } @else {
+      @for (metric of metrics; track trackByMetric($index, metric)) {
+        <article
+          class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <span
+              class="inline-flex h-12 w-12 items-center justify-center rounded-full ring-1"
+              [ngClass]="getMetricToneClass(metric)"
+            >
+              <lucide-icon
+                [img]="getMetricIcon(metric)"
+                class="h-5 w-5"
+              ></lucide-icon>
+            </span>
+
+            <span
+              class="rounded-full border border-white/60 bg-white/50 px-2.5 py-1 text-[11px] font-medium text-gray-500 dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-400"
+            >
+              Expediente
+            </span>
+          </div>
+
+          <div class="mt-5 space-y-1.5">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ metric.title }}
+            </p>
+            <p
+              class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white/95"
+            >
+              {{ metric.value }}
+            </p>
+            <p class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+              {{ metric.detail }}
+            </p>
+          </div>
+        </article>
+      }
+    }
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+    >
+      <div class="mb-5">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600 dark:text-brand-300"
+        >
+          Estados
+        </p>
+        <h2 class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90">
+          Distribucion del expediente
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Balance general por estatus documental.
+        </p>
+      </div>
+
+      @if (isLoading) {
+        <div class="animate-pulse space-y-4">
+          <div
+            class="mx-auto h-56 w-56 rounded-full bg-gray-200 dark:bg-white/10"
+          ></div>
+          <div class="grid grid-cols-2 gap-3">
+            @for (_ of listSkeleton; track $index) {
+              <div class="h-4 rounded bg-gray-200 dark:bg-white/10"></div>
+            }
+          </div>
+        </div>
+      } @else {
+        <apx-chart
+          [series]="statusSeries"
+          [chart]="statusChart"
+          [labels]="statusLabels"
+          [legend]="statusLegend"
+          [stroke]="statusStroke"
+          [plotOptions]="statusPlotOptions"
+          [dataLabels]="statusDataLabels"
+          [tooltip]="statusTooltip"
+          [theme]="statusTheme"
+          [responsive]="statusResponsive"
+          [colors]="statusColors"
+        ></apx-chart>
+      }
+    </article>
+
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+    >
+      <div class="mb-5">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.22em] text-violet-600 dark:text-violet-300"
+        >
+          Tendencia
+        </p>
+        <h2 class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90">
+          Carga y revision mensual
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Flujo dummy de ingresos y revisiones completadas.
+        </p>
+      </div>
+
+      @if (isLoading) {
+        <div class="animate-pulse space-y-4">
+          <div class="h-64 rounded-2xl bg-gray-200 dark:bg-white/10"></div>
+          <div class="grid grid-cols-6 gap-2">
+            @for (_ of listSkeleton; track $index) {
+              <div class="h-4 rounded bg-gray-200 dark:bg-white/10"></div>
+            }
+          </div>
+        </div>
+      } @else {
+        <apx-chart
+          [series]="trendSeries"
+          [chart]="trendChart"
+          [xaxis]="trendXAxis"
+          [yaxis]="trendYAxis"
+          [grid]="trendGrid"
+          [stroke]="trendStroke"
+          [fill]="trendFill"
+          [legend]="trendLegend"
+          [dataLabels]="trendDataLabels"
+          [tooltip]="trendTooltip"
+          [theme]="trendTheme"
+          [colors]="trendColors"
+        ></apx-chart>
+      }
+    </article>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+    <article
+      class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10 xl:col-span-8"
+      id="expediente-proveedores"
+    >
+      <div class="mb-5">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.22em] text-sky-600 dark:text-sky-300"
+        >
+          Proveedores
+        </p>
+        <h2 class="mt-2 text-lg font-semibold text-gray-900 dark:text-white/90">
+          Personas por proveedor
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Vista comparativa del volumen operativo por proveedor.
+        </p>
+      </div>
+
+      @if (isLoading) {
+        <div class="animate-pulse space-y-4">
+          <div class="h-64 rounded-2xl bg-gray-200 dark:bg-white/10"></div>
+          <div class="grid grid-cols-6 gap-2">
+            @for (_ of listSkeleton; track $index) {
+              <div class="h-4 rounded bg-gray-200 dark:bg-white/10"></div>
+            }
+          </div>
+        </div>
+      } @else {
+        <apx-chart
+          [series]="providerSeries"
+          [chart]="providerChart"
+          [xaxis]="providerXAxis"
+          [yaxis]="providerYAxis"
+          [grid]="providerGrid"
+          [plotOptions]="providerPlotOptions"
+          [dataLabels]="providerDataLabels"
+          [tooltip]="providerTooltip"
+          [theme]="providerTheme"
+          [colors]="providerColors"
+        ></apx-chart>
+      }
+    </article>
+
+    <article
+      class="app-bg-card-glass h-full rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10 xl:col-span-4"
+    >
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+          Proveedores con mas personal
+        </h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Ranking rapido por concentracion de personas.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        @for (
+          provider of dashboardData.topProviders;
+          track trackByProvider($index, provider)
+        ) {
+          <div
+            class="rounded-2xl border border-gray-200/70 p-4 transition hover:border-brand-300/40 hover:bg-brand-50/15 dark:border-white/10 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p
+                  class="truncate text-sm font-semibold text-gray-900 dark:text-white/90"
+                >
+                  {{ provider.name }}
+                </p>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {{ provider.sector }}
+                </p>
+              </div>
+              <span
+                class="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:border-white/10 dark:bg-white/[0.03] dark:text-gray-300"
+              >
+                {{ provider.people }} personas
+              </span>
+            </div>
+            <div
+              class="mt-3 h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-white/10"
+            >
+              <div
+                class="h-full rounded-full bg-gradient-to-r from-brand-500 to-cyan-500"
+                [style.width.%]="provider.approvedRate"
+              ></div>
+            </div>
+            <div
+              class="mt-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400"
+            >
+              <span>Indice aprobado</span>
+              <span class="font-semibold text-gray-700 dark:text-gray-300">
+                {{ provider.approvedRate }}%
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+  </section>
+
+  @if (false) {
+    <section class="grid grid-cols-1 items-stretch gap-4 xl:grid-cols-2">
+      <article
+        class="app-bg-card-glass h-full rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10"
+      >
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+              Accesos rapidos
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Atajos internos del dashboard dummy.
+            </p>
+          </div>
+          <lucide-icon
+            [img]="FolderOpen"
+            class="h-5 w-5 text-brand-500"
+          ></lucide-icon>
+        </div>
+
+        <div class="grid h-full content-start gap-3 sm:grid-cols-2">
+          @for (action of quickActions; track trackByAction($index, action)) {
+            <button
+              type="button"
+              class="rounded-2xl border border-gray-200/70 p-4 text-left transition hover:border-brand-300/50 hover:bg-brand-50/20 dark:border-white/10 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5"
+              (click)="jumpToSection(action.sectionId)"
+            >
+              <div class="flex items-start gap-3">
+                <span
+                  class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ring-1"
+                  [ngClass]="getQuickActionTone(action)"
+                >
+                  <lucide-icon
+                    [img]="getQuickActionIcon(action)"
+                    class="h-5 w-5"
+                  ></lucide-icon>
+                </span>
+                <div class="min-w-0">
+                  <p
+                    class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ action.title }}
+                  </p>
+                  <p
+                    class="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                  >
+                    {{ action.description }}
+                  </p>
+                  <span
+                    class="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-300"
+                  >
+                    {{ action.ctaLabel }}
+                    <lucide-icon
+                      [img]="ArrowRight"
+                      class="h-3.5 w-3.5"
+                    ></lucide-icon>
+                  </span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
+      <article
+        class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10 xl:col-span-5"
+        id="expediente-revision"
+      >
+        <div class="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+              Expedientes por vencer
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Casos dummy para seguimiento inmediato.
+            </p>
+          </div>
+          <lucide-icon
+            [img]="Clock"
+            class="h-5 w-5 text-warning-500"
+          ></lucide-icon>
+        </div>
+
+        <div class="space-y-3">
+          @for (item of expiringFiles; track trackByExpiry($index, item)) {
+            <div
+              class="rounded-2xl border border-gray-200/70 p-4 transition hover:border-warning-300/40 hover:bg-warning-50/20 dark:border-white/10 dark:hover:border-warning-500/30 dark:hover:bg-warning-500/5"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <p
+                    class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                  >
+                    {{ item.personName }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ item.providerName }}
+                  </p>
+                </div>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getExpiryBadgeClass(item)"
+                >
+                  {{ item.status }}
+                </span>
+              </div>
+
+              <div
+                class="mt-3 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400"
+              >
+                <span>Vigencia restante</span>
+                <span class="font-semibold text-gray-900 dark:text-white/90">
+                  {{ item.daysLeft }} dias
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article
+        class="app-bg-card-glass rounded-2xl border border-gray-200/70 p-5 shadow-sm dark:border-white/10 xl:col-span-7"
+        id="expediente-altas"
+      >
+        <div class="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+              Ultimos movimientos
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Bitacora dummy del flujo administrativo del expediente.
+            </p>
+          </div>
+          <lucide-icon
+            [img]="LayoutDashboard"
+            class="h-5 w-5 text-brand-500"
+          ></lucide-icon>
+        </div>
+
+        <div class="space-y-3">
+          @for (
+            movement of recentMovements;
+            track trackByMovement($index, movement)
+          ) {
+            <div
+              class="rounded-2xl border border-gray-200/70 p-4 transition hover:border-brand-300/40 hover:bg-brand-50/15 dark:border-white/10 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5"
+            >
+              <div class="flex items-start gap-3">
+                <span
+                  class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
+                  [ngClass]="getMovementTone(movement)"
+                >
+                  <lucide-icon
+                    [img]="getMovementIcon(movement)"
+                    class="h-5 w-5"
+                  ></lucide-icon>
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{ movement.title }}
+                    </p>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ movement.timestamp | date: "dd MMM yyyy, HH:mm" }}
+                    </span>
+                  </div>
+                  <p
+                    class="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400"
+                  >
+                    {{ movement.description }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+  }
+</div>

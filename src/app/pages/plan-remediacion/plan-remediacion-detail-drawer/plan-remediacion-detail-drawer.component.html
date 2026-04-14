@@ -1,0 +1,533 @@
+@if (isOpen && remediationCase) {
+  <div class="fixed inset-0 z-[100000]">
+    <div
+      class="fixed inset-0 z-[9998] bg-gray-900/45 backdrop-blur-sm transition-opacity duration-200 ease-out"
+      [ngClass]="
+        isOverlayVisible ? 'opacity-100' : 'pointer-events-none opacity-0'
+      "
+      (click)="closeDrawer()"
+    ></div>
+
+    <aside
+      class="fixed top-0 right-0 z-[9999] h-full w-full rounded-l-4xl app-bg-modal-glass transition-all duration-300 ease-out sm:w-[92vw] lg:w-[76vw] xl:w-[68vw]"
+      [ngClass]="
+        isPanelVisible
+          ? 'translate-x-0 opacity-100'
+          : 'translate-x-full opacity-0'
+      "
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="flex h-full flex-col">
+        <div
+          class="flex items-start justify-between border-b border-gray-200 px-5 py-4 dark:border-gray-700"
+        >
+          <div>
+            <p
+              class="text-xs font-semibold tracking-wide text-brand-600 uppercase dark:text-brand-300"
+            >
+              {{ isAdmin ? "Gestion de remediacion" : "Detalle de mi accion" }}
+            </p>
+            <h2 class="mt-1 text-lg font-semibold text-gray-800 dark:text-white/90">
+              {{ remediationCase.title }}
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Relacionado con {{ remediationCase.evaluationName }}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            (click)="closeDrawer()"
+            aria-label="Cerrar detalle"
+          >
+            <lucide-icon [img]="X" class="h-4 w-4"></lucide-icon>
+          </button>
+        </div>
+
+        <div class="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+          <div
+            class="rounded-2xl border border-brand-200/70 bg-gradient-to-br from-brand-500/10 via-white to-white p-5 dark:border-brand-500/30 dark:from-brand-500/15 dark:via-gray-900/70 dark:to-gray-900/40"
+          >
+            <div class="flex flex-wrap items-start justify-between gap-4">
+              <div class="space-y-3">
+                <div class="inline-flex items-center gap-3">
+                  <span
+                    class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+                  >
+                    <lucide-icon
+                      [img]="ShieldAlert"
+                      class="h-6 w-6"
+                    ></lucide-icon>
+                  </span>
+                  <div>
+                    <p
+                      class="text-xs font-semibold tracking-wide text-brand-600 uppercase dark:text-brand-300"
+                    >
+                      {{ remediationCase.source }}
+                    </p>
+                    <h3
+                      class="text-base font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{ remediationCase.clientName }}
+                    </h3>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                    [ngClass]="getPriorityClasses(remediationCase.priority)"
+                  >
+                    Prioridad {{ remediationCase.priority }}
+                  </span>
+                  <span
+                    class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                    [ngClass]="getStatusClasses(remediationCase.status)"
+                  >
+                    {{ remediationCase.status }}
+                  </span>
+                </div>
+              </div>
+
+              @if (isAdmin && remediationCase.requiresValidation) {
+                <button
+                  type="button"
+                  class="inline-flex h-10 items-center gap-2 rounded-xl bg-success-500 px-4 text-sm font-medium text-white transition hover:bg-success-600"
+                  (click)="validateClosure()"
+                >
+                  <lucide-icon [img]="CheckCheck" class="h-4 w-4"></lucide-icon>
+                  Validar cierre
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon [img]="UserRound" class="h-4 w-4 text-brand-500"></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Contexto del caso
+                </p>
+              </div>
+
+              <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border bg-white/80 p-3 dark:border-gray-700 dark:bg-gray-900/60">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Usuario involucrado</p>
+                  <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white/90">
+                    {{ remediationCase.assignedUserName }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ remediationCase.assignedUserArea }} / {{ remediationCase.assignedUserEmail }}
+                  </p>
+                </div>
+
+                <div class="rounded-2xl border bg-white/80 p-3 dark:border-gray-700 dark:bg-gray-900/60">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Responsable</p>
+                  <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white/90">
+                    {{ remediationCase.responsibleName }}
+                  </p>
+                  <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {{ remediationCase.responsibleRole }}
+                  </p>
+                </div>
+
+                <div class="rounded-2xl border bg-white/80 p-3 dark:border-gray-700 dark:bg-gray-900/60">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Categoria</p>
+                  <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white/90">
+                    {{ remediationCase.category }}
+                  </p>
+                </div>
+
+                <div class="rounded-2xl border bg-white/80 p-3 dark:border-gray-700 dark:bg-gray-900/60">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Fecha compromiso</p>
+                  <p class="mt-1 text-sm font-semibold text-gray-900 dark:text-white/90">
+                    {{ remediationCase.dueDate | date: 'medium' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-2xl border bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
+                <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+                  Motivo de incumplimiento
+                </p>
+                <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                  {{ remediationCase.failureReason }}
+                </p>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                  Riesgo dummy asociado: {{ remediationCase.riskLevel }}
+                </p>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon
+                  [img]="ClipboardCheck"
+                  class="h-4 w-4 text-brand-500"
+                ></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Acciones y evidencia requerida
+                </p>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                @for (action of remediationCase.correctiveActions; track action) {
+                  <div
+                    class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/60"
+                  >
+                    <p class="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                      {{ action }}
+                    </p>
+                  </div>
+                }
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                @for (evidence of remediationCase.evidenceRequired; track evidence) {
+                  <span
+                    class="inline-flex rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                  >
+                    {{ evidence }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <section class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon [img]="FileUp" class="h-4 w-4 text-brand-500"></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Evidencia dummy cargada
+                </p>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                @for (evidence of remediationCase.evidence; track evidence.id) {
+                  <div
+                    class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60"
+                  >
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                          {{ evidence.name }}
+                        </p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {{ evidence.uploadedBy }} / {{ evidence.uploadedAt | date: 'medium' }}
+                        </p>
+                      </div>
+                      <span
+                        class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                        [ngClass]="getStatusClasses(
+                          evidence.status === 'Validada'
+                            ? 'Validado'
+                            : evidence.status === 'Recibida'
+                              ? 'En revision'
+                              : 'Pendiente'
+                        )"
+                      >
+                        {{ evidence.status }}
+                      </span>
+                    </div>
+                    <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
+                      {{ evidence.description }}
+                    </p>
+                  </div>
+                }
+
+                @if (remediationCase.evidence.length === 0) {
+                  <div
+                    class="rounded-2xl border border-dashed border-gray-300 px-4 py-5 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                  >
+                    Aun no hay evidencia cargada para este caso.
+                  </div>
+                }
+              </div>
+
+              <form
+                [formGroup]="evidenceForm"
+                class="mt-4 space-y-3 rounded-2xl border border-gray-200 bg-white/70 p-4 dark:border-gray-700 dark:bg-gray-900/60"
+                (ngSubmit)="submitEvidence()"
+              >
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  {{ isAdmin ? "Subir evidencia dummy o soporte" : "Subir evidencia dummy" }}
+                </p>
+                <input
+                  type="text"
+                  formControlName="name"
+                  placeholder="Nombre del archivo dummy"
+                  class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+                <textarea
+                  rows="3"
+                  formControlName="description"
+                  placeholder="Descripcion breve de la evidencia"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                ></textarea>
+                <button
+                  type="submit"
+                  class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+                >
+                  Cargar evidencia
+                </button>
+              </form>
+            </section>
+
+            <section class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon
+                  [img]="MessageSquareText"
+                  class="h-4 w-4 text-brand-500"
+                ></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Comentarios y seguimiento
+                </p>
+              </div>
+
+              @if (isAdmin) {
+                <div
+                  class="mt-4 rounded-2xl border border-brand-200/70 bg-brand-50/60 px-4 py-3 dark:border-brand-500/30 dark:bg-brand-500/10"
+                >
+                  <p class="text-xs font-semibold tracking-wide text-brand-700 uppercase dark:text-brand-300">
+                    Nota interna
+                  </p>
+                  <p class="mt-2 text-sm leading-6 text-brand-900 dark:text-brand-100">
+                    {{ remediationCase.internalCommentsNote || 'Sin nota interna registrada.' }}
+                  </p>
+                </div>
+              }
+
+              <div class="mt-4 space-y-3">
+                @for (comment of visibleComments; track comment.id) {
+                  <div
+                    class="rounded-2xl border border-gray-200 bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60"
+                  >
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                        {{ comment.author }}
+                      </p>
+                      <div class="flex items-center gap-2">
+                        @if (comment.internal) {
+                          <span
+                            class="inline-flex rounded-full border border-warning-300 bg-warning-50 px-2 py-0.5 text-[11px] font-semibold text-warning-700 dark:border-warning-500/40 dark:bg-warning-500/10 dark:text-warning-300"
+                          >
+                            Interno
+                          </span>
+                        }
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          {{ comment.createdAt | date: 'medium' }}
+                        </span>
+                      </div>
+                    </div>
+                    <p class="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                      {{ comment.message }}
+                    </p>
+                  </div>
+                }
+
+                @if (visibleComments.length === 0) {
+                  <div
+                    class="rounded-2xl border border-dashed border-gray-300 px-4 py-5 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                  >
+                    No hay comentarios visibles todavia.
+                  </div>
+                }
+              </div>
+
+              <form
+                [formGroup]="commentForm"
+                class="mt-4 space-y-3 rounded-2xl border border-gray-200 bg-white/70 p-4 dark:border-gray-700 dark:bg-gray-900/60"
+                (ngSubmit)="submitComment()"
+              >
+                <textarea
+                  rows="3"
+                  formControlName="message"
+                  placeholder="Agregar comentario de seguimiento"
+                  class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                ></textarea>
+                @if (isAdmin) {
+                  <label class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <input type="checkbox" formControlName="internal" class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500" />
+                    Marcar como comentario interno
+                  </label>
+                }
+                <button
+                  type="submit"
+                  class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+                >
+                  Guardar comentario
+                </button>
+              </form>
+            </section>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <section class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon
+                  [img]="CalendarClock"
+                  class="h-4 w-4 text-brand-500"
+                ></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  {{ isAdmin ? "Gestion del plan" : "Actualizar avance" }}
+                </p>
+              </div>
+
+              @if (isAdmin) {
+                <form [formGroup]="adminForm" class="mt-4 space-y-4" (ngSubmit)="submitAdminPlan()">
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Prioridad</label>
+                      <select
+                        formControlName="priority"
+                        class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                      >
+                        @for (priority of priorities; track priority) {
+                          <option [value]="priority">{{ priority }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Estatus</label>
+                      <select
+                        formControlName="status"
+                        class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                      >
+                        @for (status of adminStatuses; track status) {
+                          <option [value]="status">{{ status }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Responsable</label>
+                      <input
+                        type="text"
+                        formControlName="responsibleName"
+                        class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Rol del responsable</label>
+                      <input
+                        type="text"
+                        formControlName="responsibleRole"
+                        class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                    </div>
+
+                    <div class="md:col-span-2">
+                      <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha compromiso</label>
+                      <input
+                        type="datetime-local"
+                        formControlName="dueDate"
+                        class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                      />
+                    </div>
+                  </div>
+
+                  <textarea
+                    rows="3"
+                    formControlName="evidenceRequiredText"
+                    placeholder="Una evidencia requerida por linea"
+                    class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                  ></textarea>
+                  <textarea
+                    rows="3"
+                    formControlName="correctiveActionsText"
+                    placeholder="Una accion correctiva por linea"
+                    class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                  ></textarea>
+                  <textarea
+                    rows="3"
+                    formControlName="internalCommentsNote"
+                    placeholder="Comentarios internos del plan"
+                    class="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                  ></textarea>
+                  <button
+                    type="submit"
+                    class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+                  >
+                    Guardar plan
+                  </button>
+                </form>
+              } @else {
+                <form [formGroup]="userProgressForm" class="mt-4 space-y-4" (ngSubmit)="submitUserProgress()">
+                  <div>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Avance actual: {{ userProgressForm.get('progress')?.value }}%
+                    </label>
+                    <input type="range" min="0" max="100" formControlName="progress" class="w-full accent-brand-500" />
+                  </div>
+
+                  <div>
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Estatus</label>
+                    <select
+                      formControlName="status"
+                      class="h-11 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm text-gray-700 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                    >
+                      @for (status of userStatuses; track status) {
+                        <option [value]="status">{{ status }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="inline-flex h-10 items-center justify-center rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+                  >
+                    Actualizar avance
+                  </button>
+                </form>
+              }
+            </section>
+
+            <section class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon [img]="History" class="h-4 w-4 text-brand-500"></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Historial dummy de seguimiento
+                </p>
+              </div>
+
+              <div class="mt-4 space-y-4">
+                @for (item of remediationCase.history; track item.id; let isLast = $last) {
+                  <div class="flex gap-3">
+                    <div class="flex flex-col items-center">
+                      <span
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold"
+                        [ngClass]="getHistoryToneClasses(item.tone)"
+                      >
+                        {{ $index + 1 }}
+                      </span>
+                      @if (!isLast) {
+                        <span class="mt-2 h-10 w-px bg-gray-200 dark:bg-gray-700"></span>
+                      }
+                    </div>
+                    <div class="pb-2">
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                        {{ item.title }}
+                      </p>
+                      <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        {{ item.description }}
+                      </p>
+                      <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {{ item.actor }} / {{ item.createdAt | date: 'medium' }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+}

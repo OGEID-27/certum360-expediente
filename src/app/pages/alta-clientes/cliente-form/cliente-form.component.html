@@ -1,0 +1,611 @@
+﻿<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <app-component-card
+    [title]="pageTitle"
+    [titleIcon]="clientId ? Pencil : Plus"
+    titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+    desc="Configura datos generales y fiscales del cliente pagador."
+    className="mb-3"
+  >
+    <button
+      cardHeaderActions
+      type="button"
+      class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+      (click)="goBack()"
+    >
+      <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+      Volver
+    </button>
+
+    <form class="space-y-5" [formGroup]="form" (ngSubmit)="saveClient()">
+      <section
+        class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <h3
+            class="text-lg font-semibold text-gray-800 dark:text-white/90 sm:text-xl"
+          >
+            Datos generales
+          </h3>
+          @if (isProspecto && !fiscalCompleto) {
+            <span
+              class="inline-flex rounded-full border border-warning-300 bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 dark:border-warning-500/40 dark:bg-warning-500/10 dark:text-warning-300"
+            >
+              Fiscal incompleto
+            </span>
+          }
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div class="space-y-4 md:col-span-8">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Tipo de cliente <span class="text-red-500">*</span></label
+                >
+                <select
+                  formControlName="tipoCliente"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('tipoCliente')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                >
+                  <option value="MORAL">{{ tipoLabels.MORAL }}</option>
+                  <option value="FISICA">{{ tipoLabels.FISICA }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                  >Estatus <span class="text-red-500">*</span></label
+                >
+                <select
+                  formControlName="estatus"
+                  class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                  [ngClass]="
+                    isInvalid('estatus')
+                      ? 'border-red-400 dark:border-red-500'
+                      : 'border-gray-300 dark:border-gray-700'
+                  "
+                >
+                  @for (estatus of estatusOptions; track estatus) {
+                    <option [value]="estatus">{{ estatus }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Cliente <span class="text-red-500">*</span></label
+              >
+              <input
+                type="text"
+                formControlName="nombreCliente"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('nombreCliente')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasError("nombreCliente", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  El nombre del cliente es obligatorio.
+                </p>
+              }
+              @if (hasError("nombreCliente", "minlength")) {
+                <p class="mt-1 text-xs text-red-500">
+                  Debe contener al menos 3 caracteres.
+                </p>
+              }
+            </div>
+          </div>
+
+          <div class="md:col-span-4">
+            <div
+              class="flex h-full min-h-[170px] items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50/70 p-4 transition hover:border-brand-300 hover:bg-brand-50/40 dark:border-gray-700 dark:bg-gray-900/40 dark:hover:border-brand-500/50 dark:hover:bg-brand-500/10"
+            >
+              <label
+                for="cliente-photo-input"
+                class="flex cursor-pointer flex-col items-center text-center"
+              >
+                <span
+                  class="grid h-24 w-24 place-items-center rounded-full border-2 border-dashed border-brand-300 bg-brand-500/10 text-brand-600 dark:border-brand-500/60 dark:bg-brand-500/15 dark:text-brand-300"
+                >
+                  <lucide-icon [img]="Camera" class="h-8 w-8"></lucide-icon>
+                </span>
+                <span
+                  class="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-300"
+                  >Agregar Foto</span
+                >
+              </label>
+              <input
+                id="cliente-photo-input"
+                type="file"
+                accept="image/*"
+                class="sr-only"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 md:col-span-12 md:grid-cols-2">
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Sector <span class="text-red-500">*</span></label
+              >
+              <select
+                formControlName="sector"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('sector')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              >
+                <option value="" disabled>Selecciona sector</option>
+                @for (sector of sectores; track sector) {
+                  <option [value]="sector">{{ sector }}</option>
+                }
+              </select>
+              @if (hasError("sector", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  El sector es obligatorio.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Contacto principal <span class="text-red-500">*</span></label
+              >
+              <input
+                type="text"
+                formControlName="contactoNombre"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('contactoNombre')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasError("contactoNombre", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  El contacto principal es obligatorio.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Correo principal <span class="text-red-500">*</span></label
+              >
+              <input
+                type="email"
+                formControlName="correoPrincipal"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('correoPrincipal')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasError("correoPrincipal", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  El correo principal es obligatorio.
+                </p>
+              }
+              @if (hasError("correoPrincipal", "email")) {
+                <p class="mt-1 text-xs text-red-500">
+                  Formato de correo invalido.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Telefono</label
+              >
+              <input
+                type="text"
+                formControlName="telefono"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('telefono')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasError("telefono", "pattern")) {
+                <p class="mt-1 text-xs text-red-500">Telefono invalido.</p>
+              }
+            </div>
+          </div>
+
+          <div class="md:col-span-12">
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Notas</label
+            >
+            <textarea
+              rows="3"
+              formControlName="notas"
+              class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3
+            class="text-lg font-semibold text-gray-800 dark:text-white/90 sm:text-xl"
+          >
+            Datos fiscales
+          </h3>
+
+          @if (isActivo && !fiscalCompleto) {
+            <span
+              class="inline-flex rounded-full border border-error-300 bg-error-50 px-2.5 py-1 text-xs font-medium text-error-700 dark:border-error-500/40 dark:bg-error-500/10 dark:text-error-300"
+            >
+              Para Activo, completa datos fiscales
+            </span>
+          }
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >RFC <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="rfc"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm uppercase text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('rfc')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+            @if (hasError("rfc", "required")) {
+              <p class="mt-1 text-xs text-red-500">
+                El RFC es obligatorio para clientes activos.
+              </p>
+            }
+            @if (hasError("rfc", "pattern")) {
+              <p class="mt-1 text-xs text-red-500">RFC invalido.</p>
+            }
+          </div>
+
+          @if (form.get("tipoCliente")?.value === "MORAL") {
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Razon social fiscal <span class="text-red-500">*</span></label
+              >
+              <input
+                type="text"
+                formControlName="razonSocialFiscal"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('razonSocialFiscal')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasError("razonSocialFiscal", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  Campo obligatorio para clientes activos.
+                </p>
+              }
+            </div>
+          } @else {
+            <div>
+              <label
+                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >Nombre fiscal <span class="text-red-500">*</span></label
+              >
+              <input
+                type="text"
+                formControlName="nombreFiscal"
+                class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+                [ngClass]="
+                  isInvalid('nombreFiscal')
+                    ? 'border-red-400 dark:border-red-500'
+                    : 'border-gray-300 dark:border-gray-700'
+                "
+              />
+              @if (hasError("nombreFiscal", "required")) {
+                <p class="mt-1 text-xs text-red-500">
+                  Campo obligatorio para clientes activos.
+                </p>
+              }
+            </div>
+          }
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Regimen fiscal <span class="text-red-500">*</span></label
+            >
+            <select
+              formControlName="regimenFiscal"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('regimenFiscal')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            >
+              <option value="" disabled>Selecciona regimen</option>
+              @for (regimen of regimenOptions; track regimen) {
+                <option [value]="regimen">{{ regimen }}</option>
+              }
+            </select>
+            @if (hasError("regimenFiscal", "required")) {
+              <p class="mt-1 text-xs text-red-500">
+                Campo obligatorio para clientes activos.
+              </p>
+            }
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >CP fiscal <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="cpFiscal"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('cpFiscal')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+            @if (hasError("cpFiscal", "required")) {
+              <p class="mt-1 text-xs text-red-500">
+                Campo obligatorio para clientes activos.
+              </p>
+            }
+            @if (hasError("cpFiscal", "pattern")) {
+              <p class="mt-1 text-xs text-red-500">
+                El codigo postal debe tener 5 digitos.
+              </p>
+            }
+          </div>
+
+          <div class="md:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Correo facturacion <span class="text-red-500">*</span></label
+            >
+            <input
+              type="email"
+              formControlName="correoFacturacion"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden disabled:bg-gray-100 dark:bg-gray-900 dark:text-white/90 dark:disabled:bg-gray-800"
+              [ngClass]="
+                isInvalid('correoFacturacion')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+            @if (hasError("correoFacturacion", "required")) {
+              <p class="mt-1 text-xs text-red-500">
+                Campo obligatorio para clientes activos.
+              </p>
+            }
+            @if (hasError("correoFacturacion", "email")) {
+              <p class="mt-1 text-xs text-red-500">
+                Formato de correo invalido.
+              </p>
+            }
+          </div>
+
+          <div class="md:col-span-2">
+            <label
+              class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
+            >
+              <input
+                type="checkbox"
+                formControlName="usarCorreoPrincipalFacturacion"
+                class="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+              />
+              Usar correo principal
+            </label>
+          </div>
+        </div>
+
+        <div
+          formGroupName="domicilioFiscal"
+          class="grid grid-cols-1 gap-4 rounded-xl border border-dashed border-gray-300 p-4 dark:border-gray-700 md:grid-cols-2"
+        >
+          <h4
+            class="md:col-span-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Domicilio fiscal
+          </h4>
+
+          <div class="md:col-span-2">
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Calle <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="calle"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('domicilioFiscal.calle')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Numero ext <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="numeroExt"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('domicilioFiscal.numeroExt')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Numero int</label
+            >
+            <input
+              type="text"
+              formControlName="numeroInt"
+              class="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Colonia <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="colonia"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('domicilioFiscal.colonia')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Municipio <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="municipio"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('domicilioFiscal.municipio')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Estado <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="estado"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('domicilioFiscal.estado')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+
+          <div>
+            <label
+              class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+              >Pais <span class="text-red-500">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="pais"
+              class="h-11 w-full rounded-lg border bg-white px-3 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden dark:bg-gray-900 dark:text-white/90"
+              [ngClass]="
+                isInvalid('domicilioFiscal.pais')
+                  ? 'border-red-400 dark:border-red-500'
+                  : 'border-gray-300 dark:border-gray-700'
+              "
+            />
+          </div>
+        </div>
+      </section>
+
+      <div class="flex items-center justify-end gap-3">
+        <button
+          type="button"
+          class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"
+          (click)="cancel()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+  </app-component-card>
+
+  <app-component-card
+    title="Usuarios del cliente"
+    [titleIcon]="Users"
+    titleIconClass="h-4 w-4 text-brand-600 dark:text-brand-300"
+    desc="Administra usuarios asociados al cliente."
+  >
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        @if (!canManageUsers) {
+          Guarda el cliente para administrar usuarios.
+        } @else {
+          Ya puedes alta/editar/bloquear usuarios ligados a este cliente.
+        }
+      </div>
+
+      <button
+        type="button"
+        class="inline-flex h-10 items-center gap-2 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
+        [disabled]="!canManageUsers"
+        (click)="openUsersDrawer()"
+      >
+        <lucide-icon [img]="Users" class="h-4 w-4"></lucide-icon>
+        Administrar usuarios
+      </button>
+    </div>
+  </app-component-card>
+
+  @if (usersDrawerOpen) {
+    <app-client-users-drawer
+      [isOpen]="usersDrawerOpen"
+      [clientId]="clientId"
+      [clientName]="form.get('nombreCliente')?.value ?? ''"
+      (closed)="closeUsersDrawer()"
+    ></app-client-users-drawer>
+  }
+</div>

@@ -1,0 +1,466 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  <div class="app-bg-card-glass space-y-4 rounded-xl p-3 sm:p-4 lg:p-5">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="space-y-2">
+        <div class="flex items-center gap-2">
+          <lucide-icon
+            [img]="Signature"
+            class="h-6 w-6 text-brand-600 dark:text-brand-300"
+          ></lucide-icon>
+          <h1
+            class="text-xl font-semibold text-gray-900 dark:text-white/90 sm:text-2xl"
+          >
+            Firma de contrato
+          </h1>
+        </div>
+        <p class="max-w-3xl text-sm text-gray-600 dark:text-gray-300">
+          Revisa la version vigente del contrato del servicio, descarga el archivo
+          dummy y completa la firma digital de forma visual desde ADMIN.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          class="inline-flex rounded-full border px-3 py-1.5 text-xs font-semibold"
+          [ngClass]="getStatusClasses(contract.status)"
+        >
+          {{ contract.status }}
+        </span>
+        <span
+          class="inline-flex rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+        >
+          {{ contract.version }} vigente
+        </span>
+      </div>
+    </div>
+
+    @if (banner) {
+      <div
+        class="rounded-2xl border px-4 py-3"
+        [ngClass]="
+          banner.tone === 'success'
+            ? 'border-success-300 bg-success-50 text-success-700 dark:border-success-500/40 dark:bg-success-500/10 dark:text-success-300'
+            : 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500/40 dark:bg-blue-500/10 dark:text-blue-300'
+        "
+      >
+        <p class="text-sm font-medium">
+          {{ banner.message }}
+        </p>
+      </div>
+    }
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
+      <div class="rounded-2xl border app-bg-card-glass p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              Contrato vigente
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+              {{ contract.id }}
+            </p>
+          </div>
+          <lucide-icon [img]="FileBadge" class="h-5 w-5 text-brand-500"></lucide-icon>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border app-bg-card-glass p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              Version actual
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+              {{ contract.version }}
+            </p>
+          </div>
+          <lucide-icon [img]="RefreshCw" class="h-5 w-5 text-brand-500"></lucide-icon>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border app-bg-card-glass p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              Estatus contractual
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+              {{ contract.status }}
+            </p>
+          </div>
+          <lucide-icon
+            [img]="contract.status === 'Firmado' ? BadgeCheck : BadgeAlert"
+            class="h-5 w-5 text-brand-500"
+          ></lucide-icon>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border app-bg-card-glass p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              Fecha de emision
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+              {{ contract.issuedAt | date: "mediumDate" }}
+            </p>
+          </div>
+          <lucide-icon [img]="CalendarClock" class="h-5 w-5 text-brand-500"></lucide-icon>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border app-bg-card-glass p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              {{ deadlineLabel }}
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+              {{
+                (contract.status === "Firmado"
+                  ? contract.signedAt
+                  : contract.signingDueAt
+                ) | date: "mediumDate"
+              }}
+            </p>
+          </div>
+          <lucide-icon [img]="Signature" class="h-5 w-5 text-brand-500"></lucide-icon>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border app-bg-card-glass p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+              Ultima actualizacion
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+              {{ contract.lastUpdatedAt | date: "mediumDate" }}
+            </p>
+          </div>
+          <lucide-icon [img]="RefreshCw" class="h-5 w-5 text-brand-500"></lucide-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
+    <div class="space-y-4 xl:col-span-8">
+      <section class="overflow-hidden rounded-2xl border app-bg-card-glass">
+        <div
+          class="border-b border-brand-200/70 bg-gradient-to-br from-brand-500/10 via-white to-white p-5 dark:border-brand-500/20 dark:from-brand-500/15 dark:via-gray-900/70 dark:to-gray-900/40"
+        >
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="space-y-3">
+              <div class="inline-flex items-center gap-3">
+                <span
+                  class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+                >
+                  <lucide-icon [img]="FileText" class="h-6 w-6"></lucide-icon>
+                </span>
+                <div>
+                  <p class="text-xs font-semibold tracking-wide text-brand-600 uppercase dark:text-brand-300">
+                    Contrato actual
+                  </p>
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+                    {{ contract.name }}
+                  </h2>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getStatusClasses(contract.status)"
+                >
+                  {{ contract.status }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border border-brand-200 bg-white/80 px-2.5 py-1 text-xs font-semibold text-brand-700 dark:border-brand-500/30 dark:bg-gray-900/70 dark:text-brand-300"
+                >
+                  Version {{ contract.version }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border border-success-200 bg-success-50 px-2.5 py-1 text-xs font-semibold text-success-700 dark:border-success-500/30 dark:bg-success-500/10 dark:text-success-300"
+                >
+                  Vigente
+                </span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-300 bg-white/80 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200 dark:hover:bg-gray-800"
+                (click)="openDetailDrawer()"
+              >
+                <lucide-icon [img]="Eye" class="h-4 w-4"></lucide-icon>
+                Ver detalle
+              </button>
+
+              <button
+                type="button"
+                class="inline-flex h-10 items-center gap-2 rounded-xl border border-gray-300 bg-white/80 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-200 dark:hover:bg-gray-800"
+                (click)="downloadContract()"
+              >
+                <lucide-icon [img]="Download" class="h-4 w-4"></lucide-icon>
+                Descargar
+              </button>
+
+              <button
+                type="button"
+                class="inline-flex h-10 items-center gap-2 rounded-xl px-4 text-sm font-medium text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50"
+                [ngClass]="
+                  contract.status === 'Firmado'
+                    ? 'bg-success-500 hover:bg-success-600'
+                    : 'bg-brand-500 hover:bg-brand-600'
+                "
+                [disabled]="contract.status === 'Firmado'"
+                (click)="openSignDrawer()"
+              >
+                <lucide-icon [img]="Signature" class="h-4 w-4"></lucide-icon>
+                {{ contract.status === "Firmado" ? "Contrato firmado" : "Firmar contrato" }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-5 p-5">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div class="rounded-2xl border bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Cliente / empresa</p>
+              <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+                {{ contract.companyName }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Fecha de emision</p>
+              <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+                {{ contract.issuedAt | date: "mediumDate" }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
+              <p class="text-xs text-gray-500 dark:text-gray-400">{{ deadlineLabel }}</p>
+              <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+                {{
+                  (contract.status === "Firmado"
+                    ? contract.signedAt
+                    : contract.signingDueAt
+                  ) | date: "medium"
+                }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl border bg-white/80 p-4 dark:border-gray-700 dark:bg-gray-900/60">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Archivo dummy</p>
+              <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-white/90">
+                {{ contract.fileName }}
+              </p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {{ contract.fileSize }}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon [img]="CircleUserRound" class="h-4 w-4 text-brand-500"></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Firmante principal
+                </p>
+              </div>
+
+              <div class="mt-4 space-y-3">
+                <div>
+                  <p class="text-base font-semibold text-gray-900 dark:text-white/90">
+                    {{ contract.primarySigner.name }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ contract.primarySigner.role }}
+                  </p>
+                </div>
+
+                <div
+                  class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white/80 px-3 py-2 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300"
+                >
+                  <lucide-icon [img]="Mail" class="h-4 w-4 text-brand-500"></lucide-icon>
+                  {{ contract.primarySigner.email }}
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border app-bg-card-glass p-4">
+              <div class="flex items-center gap-2">
+                <lucide-icon [img]="ScrollText" class="h-4 w-4 text-brand-500"></lucide-icon>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  Alcance del servicio
+                </p>
+              </div>
+
+              <p class="mt-4 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                {{ contract.observations }}
+              </p>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                @for (scope of contract.serviceScope; track scope) {
+                  <span
+                    class="inline-flex rounded-full border border-brand-200 bg-brand-50/70 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                  >
+                    {{ scope }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border app-bg-card-glass p-5">
+        <div class="flex items-center gap-2">
+          <lucide-icon [img]="History" class="h-4 w-4 text-brand-500"></lucide-icon>
+          <div>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">
+              Historial / versiones
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Seguimiento compacto de emisiones y estatus del contrato.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3">
+          @for (item of versions; track item.id) {
+            <article
+              class="rounded-2xl border border-gray-200 bg-white/80 p-4 transition hover:border-brand-200 dark:border-gray-700 dark:bg-gray-900/60 dark:hover:border-brand-500/30"
+            >
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  {{ item.version }}
+                </p>
+                @if (item.isCurrent) {
+                  <span
+                    class="inline-flex rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
+                  >
+                    Vigente
+                  </span>
+                }
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium"
+                  [ngClass]="getStatusClasses(item.status)"
+                >
+                  {{ item.status }}
+                </span>
+              </div>
+
+              <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                Emitido el {{ item.issuedAt | date: "mediumDate" }}
+              </p>
+
+              <p class="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                {{ item.observation }}
+              </p>
+            </article>
+          }
+        </div>
+      </section>
+    </div>
+
+    <div class="space-y-4 xl:col-span-4">
+      <section class="rounded-2xl border app-bg-card-glass p-5">
+        <div class="flex items-center gap-2">
+          <lucide-icon [img]="ShieldCheck" class="h-4 w-4 text-brand-500"></lucide-icon>
+          <div>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">
+              Estado contractual
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Timeline del flujo de validacion y firma.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 space-y-4">
+          @for (step of contractTimeline; track step.title; let isLast = $last) {
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold"
+                  [ngClass]="
+                    step.state === 'done'
+                      ? 'border-success-300 bg-success-50 text-success-700 dark:border-success-500/40 dark:bg-success-500/10 dark:text-success-300'
+                      : step.state === 'warning'
+                        ? 'border-warning-300 bg-warning-50 text-warning-700 dark:border-warning-500/40 dark:bg-warning-500/10 dark:text-warning-300'
+                        : 'border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300'
+                  "
+                >
+                  {{ $index + 1 }}
+                </span>
+                @if (!isLast) {
+                  <span class="mt-2 h-10 w-px bg-gray-200 dark:bg-gray-700"></span>
+                }
+              </div>
+
+              <div class="pb-2">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  {{ step.title }}
+                </p>
+                <p class="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
+                  {{ step.description }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="rounded-2xl border app-bg-card-glass p-5">
+        <div class="flex items-center gap-2">
+          <lucide-icon [img]="Building2" class="h-4 w-4 text-brand-500"></lucide-icon>
+          <div>
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white/90">
+              Proximos pasos
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Acciones sugeridas para seguimiento contractual.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+          @for (step of nextSteps; track step) {
+            <div
+              class="rounded-2xl border border-gray-200 bg-white/80 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/60"
+            >
+              <p class="text-sm leading-6 text-gray-600 dark:text-gray-300">
+                {{ step }}
+              </p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+
+  @if (isDetailDrawerOpen) {
+    <app-contract-detail-drawer
+      [isOpen]="isDetailDrawerOpen"
+      [contract]="contract"
+      [versions]="versions"
+      (closed)="closeDetailDrawer()"
+      (downloadRequested)="downloadContract()"
+      (signRequested)="openSignDrawer()"
+    ></app-contract-detail-drawer>
+  }
+
+  @if (isSignDrawerOpen) {
+    <app-contract-sign-drawer
+      [isOpen]="isSignDrawerOpen"
+      [contract]="contract"
+      (closed)="closeSignDrawer()"
+      (signed)="signContract($event)"
+    ></app-contract-sign-drawer>
+  }
+</div>

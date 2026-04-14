@@ -1,0 +1,268 @@
+<div class="min-h-[calc(100vh-6rem)] space-y-4 overflow-x-hidden pb-4">
+  @if (loadError) {
+    <div class="app-bg-card-glass rounded-2xl p-5 sm:p-6">
+      <div class="space-y-4">
+        <p class="text-sm text-rose-600 dark:text-rose-300">{{ loadError }}</p>
+        <button
+          type="button"
+          class="inline-flex h-11 items-center justify-center rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+          (click)="goBack()"
+        >
+          Volver a mis evaluaciones
+        </button>
+      </div>
+    </div>
+  } @else if (attempt && questionnaire && metrics && assignment && assignedUser) {
+    <div class="space-y-4">
+      <div class="app-bg-card-glass rounded-2xl p-5 sm:p-6">
+        <div
+          class="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between"
+        >
+          <div class="flex items-start gap-4">
+            <span
+              class="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-3xl border shadow-sm"
+              [ngClass]="getStatusClass()"
+            >
+              <lucide-icon
+                [img]="!isScored ? Info : isPassed ? BadgeCheck : BadgeX"
+                class="h-8 w-8"
+              ></lucide-icon>
+            </span>
+
+            <div class="min-w-0">
+              <p
+                class="text-xs font-semibold uppercase tracking-[0.22em] text-brand-600 dark:text-brand-300"
+              >
+                Resultado del intento
+              </p>
+              <h1
+                class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white/90"
+              >
+                {{ pageTitle }}
+              </h1>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {{ subtitle }}
+              </p>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                {{ assignment.clientName }} · {{ assignment.id }}
+              </p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span
+                  class="inline-flex rounded-full border border-violet-300 bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-300"
+                >
+                  Cuestionario: {{ questionnaire.nombre }}
+                </span>
+                <span
+                  class="inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+                  [ngClass]="getAreaChipClass(assignedUser.questionnaireArea)"
+                >
+                  Area: {{ assignedUser.questionnaireArea }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+              (click)="toggleDetails()"
+            >
+              <lucide-icon [img]="Eye" class="h-4 w-4"></lucide-icon>
+              {{ showDetails ? "Ocultar detalles" : "Ver detalles" }}
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600"
+              (click)="goBack()"
+            >
+              <lucide-icon [img]="ArrowLeft" class="h-4 w-4"></lucide-icon>
+              Volver a mis evaluaciones
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        @if (isScored) {
+          <div class="rounded-2xl app-bg-card-glass p-5">
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Puntaje obtenido
+            </p>
+            <p
+              class="mt-3 text-3xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              {{ scoreLabel }}
+            </p>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Meta de aprobacion: {{ metrics.passScore }}%
+            </p>
+          </div>
+        } @else {
+          <div class="rounded-2xl app-bg-card-glass p-5">
+            <p
+              class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Tipo
+            </p>
+            <p
+              class="mt-3 text-3xl font-semibold text-gray-900 dark:text-white/90"
+            >
+              Informativa
+            </p>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Este cuestionario no genera score final.
+            </p>
+          </div>
+        }
+
+        <div class="rounded-2xl app-bg-card-glass p-5">
+          <p
+            class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          >
+            Estado
+          </p>
+          <div class="mt-3">
+            <span
+              class="inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-semibold"
+              [ngClass]="getStatusClass()"
+            >
+              {{ statusLabel }}
+            </span>
+          </div>
+          <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+            Respondidas: {{ metrics.answeredCount }}/{{
+              metrics.totalQuestions
+            }}
+          </p>
+        </div>
+
+        <div class="rounded-2xl app-bg-card-glass p-5">
+          <p
+            class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          >
+            Fecha finalizacion
+          </p>
+          <p
+            class="mt-3 text-xl font-semibold text-gray-900 dark:text-white/90"
+          >
+            {{ formatDate(attempt.submittedAt || attempt.startedAt) }}
+          </p>
+          <div
+            class="mt-3 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+          >
+            <lucide-icon [img]="Clock3" class="h-4 w-4"></lucide-icon>
+            Intento {{ attempt.id }}
+          </div>
+        </div>
+      </div>
+
+      @if (showDetails) {
+        <div class="rounded-2xl app-bg-card-glass p-5">
+          <div
+            class="flex flex-col gap-2 border-b border-gray-200 pb-4 dark:border-gray-800 sm:flex-row sm:items-end sm:justify-between"
+          >
+            <div>
+              <h2
+                class="text-lg font-semibold text-gray-900 dark:text-white/90"
+              >
+                Resumen por secciones
+              </h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Desglose dummy calculado desde localStorage.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+            @for (section of metrics.sectionMetrics; track section.section.id) {
+              <article
+                class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4 dark:border-gray-800 dark:bg-gray-900/70"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <h3
+                      class="text-sm font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{ section.section.nombre }}
+                    </h3>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      {{ section.section.descripcion }}
+                    </p>
+                  </div>
+
+                  <span
+                    class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
+                    [ngClass]="
+                      isScored
+                        ? 'border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300'
+                        : 'border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200'
+                    "
+                  >
+                    {{
+                      isScored
+                        ? (section.scorePercent || 0) + "%"
+                        : section.completionPercent + "%"
+                    }}
+                  </span>
+                </div>
+
+                <div class="mt-4 h-2 rounded-full bg-gray-200 dark:bg-gray-800">
+                  <div
+                    class="h-2 rounded-full transition-all duration-300"
+                    [ngClass]="isScored ? 'bg-brand-500' : 'bg-slate-500'"
+                    [style.width.%]="
+                      isScored
+                        ? section.scorePercent || 0
+                        : section.completionPercent
+                    "
+                  ></div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div
+                    class="rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-950"
+                  >
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      Respondidas
+                    </p>
+                    <p
+                      class="mt-1 font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{ section.answeredCount }}/{{ section.totalQuestions }}
+                    </p>
+                  </div>
+
+                  <div
+                    class="rounded-xl border border-gray-200 bg-white px-3 py-2 dark:border-gray-800 dark:bg-gray-950"
+                  >
+                    <p
+                      class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      {{ isScored ? "Correctas" : "Completitud" }}
+                    </p>
+                    <p
+                      class="mt-1 font-semibold text-gray-900 dark:text-white/90"
+                    >
+                      {{
+                        isScored
+                          ? section.correctCount
+                          : section.completionPercent
+                      }}
+                      {{ isScored ? "/" + section.totalQuestions : "%" }}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

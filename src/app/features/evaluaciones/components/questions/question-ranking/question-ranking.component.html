@@ -1,0 +1,75 @@
+<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+  <p class="mb-2 text-sm font-medium text-gray-800 dark:text-white/90">
+    {{ question.titulo }}
+    @if (question.obligatoria) {
+      <span class="text-error-500">*</span>
+    }
+  </p>
+
+  @if (question.ayuda) {
+    <p class="mb-3 text-xs text-gray-500 dark:text-gray-400">
+      {{ question.ayuda }}
+    </p>
+  }
+
+  <div
+    class="space-y-2"
+    cdkDropList
+    [cdkDropListData]="orderedOptionIds"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    @for (optionId of orderedOptionIds; track optionId; let i = $index) {
+      <div
+        cdkDrag
+        class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2.5 dark:border-gray-700 dark:bg-gray-800/40"
+      >
+        <div
+          *cdkDragPlaceholder
+          class="h-12 rounded-lg border border-dashed border-gray-300 bg-gray-50/60 dark:border-gray-700 dark:bg-gray-900/40"
+        ></div>
+
+        <button
+          type="button"
+          cdkDragHandle
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-500 cursor-grab active:cursor-grabbing hover:bg-gray-50 hover:text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white/90"
+          aria-label="Reordenar opcion"
+        >
+          <lucide-icon [img]="GripVertical" class="h-4 w-4"></lucide-icon>
+        </button>
+
+        <span
+          class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand-500/10 text-xs font-semibold text-brand-600 dark:text-brand-300"
+        >
+          {{ i + 1 }}
+        </span>
+        <span class="flex-1 text-sm text-gray-700 dark:text-gray-200">{{
+          getOptionText(optionId)
+        }}</span>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-emerald-300 text-emerald-600 hover:bg-emerald-50 disabled:opacity-40 dark:border-emerald-500/40 dark:text-emerald-300 dark:hover:bg-emerald-500/10"
+            [disabled]="i === 0"
+            (click)="moveUp(i)"
+            aria-label="Subir opcion"
+          >
+            <lucide-icon [img]="ArrowUp" class="h-4 w-4"></lucide-icon>
+          </button>
+          <button
+            type="button"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-rose-300 text-rose-600 hover:bg-rose-50 disabled:opacity-40 dark:border-rose-500/40 dark:text-rose-300 dark:hover:bg-rose-500/10"
+            [disabled]="i === orderedOptionIds.length - 1"
+            (click)="moveDown(i)"
+            aria-label="Bajar opcion"
+          >
+            <lucide-icon [img]="ArrowDown" class="h-4 w-4"></lucide-icon>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (showRequiredError) {
+    <p class="mt-2 text-xs text-error-500">Debes ordenar las opciones.</p>
+  }
+</div>

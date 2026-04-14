@@ -1,0 +1,102 @@
+<div class="relative">
+  <button
+    class="relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-transparent text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+    (click)="toggleDropdown()"
+    aria-label="Abrir notificaciones"
+  >
+    <span
+      class="absolute top-0.5 right-0 z-10 h-2 w-2 rounded-full bg-orange-400"
+      [ngClass]="{ hidden: !notifying, flex: notifying }"
+    >
+      <span
+        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"
+      ></span>
+    </span>
+
+    <lucide-icon [img]="Bell" class="h-5 w-5"></lucide-icon>
+  </button>
+
+  <app-dropdown
+    [isOpen]="isOpen"
+    (close)="closeDropdown()"
+    className="absolute right-0 mt-[17px] w-[min(26rem,calc(100vw-1rem))] overflow-hidden rounded-[24px] border-0 p-3 shadow-[0_30px_70px_-32px_rgba(15,23,42,0.6)] app-bg-card-glass"
+  >
+    <div
+      class="mb-3 flex items-center justify-between border-b border-gray-200/80 pb-3 dark:border-white/10"
+    >
+      <div>
+        <h5 class="text-lg font-semibold text-gray-900 dark:text-white/90">
+          Notificaciones
+        </h5>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          {{ summary.unread }} elementos por revisar
+        </p>
+      </div>
+
+      <span
+        class="inline-flex rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300"
+      >
+        {{ role === "admin" ? "ADMIN" : "USER" }}
+      </span>
+    </div>
+
+    <div class="max-h-[360px] space-y-2 overflow-y-auto pr-1 custom-scrollbar">
+      @for (notification of notifications; track notification.id) {
+        <button
+          type="button"
+          class="w-full rounded-2xl border border-gray-200/80 bg-white/75 p-3 text-left transition hover:border-brand-200 hover:bg-brand-50/50 dark:border-white/10 dark:bg-gray-900/60 dark:hover:border-brand-500/30 dark:hover:bg-brand-500/5"
+          (click)="navigateTo(notification.ctaRoute)"
+        >
+          <div class="flex gap-3">
+            <span
+              class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
+            >
+              <lucide-icon
+                [img]="getNotificationIcon(notification.type)"
+                class="h-4 w-4"
+              ></lucide-icon>
+            </span>
+
+            <div class="min-w-0 space-y-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white/90">
+                  {{ notification.title }}
+                </p>
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                  [ngClass]="getModuleClasses(notification.module)"
+                >
+                  {{ notification.module }}
+                </span>
+              </div>
+
+              <p class="text-sm leading-6 text-gray-500 dark:text-gray-400">
+                {{ notification.message }}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+                  [ngClass]="getTypeClasses(notification.type)"
+                >
+                  {{ notification.type }}
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ notification.createdAt | date: 'mediumDate' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </button>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="mt-3 inline-flex h-10 w-full items-center justify-center rounded-xl border border-gray-300 bg-white/80 px-4 text-sm font-medium text-gray-700 transition hover:border-brand-300 hover:text-brand-700 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300 dark:hover:border-brand-500/30 dark:hover:text-brand-300"
+      (click)="navigateTo('/notificaciones')"
+    >
+      Ver todas las notificaciones
+    </button>
+  </app-dropdown>
+</div>
